@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <title>Dog Breeds</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">Dog Breed Classifier</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="https://github.com/pxb408/Furtographer"><img src="images/github_logo.png" width="25" height="25" alt="github" /></a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="jumbotron">
+            <div class="container">
+                <h1 class="text-center">Dog Breed Classifier</h1>
+                <p class="text-center">What breed is this dog?</p>
+                <hr />
+
+                <div class="row">
+                    <div class="col-lg-6 form-group-lg text-center">
+                        <button id="take-photo" type="submit" class="btn btn-lg btn-primary">Take Photo</button>
+                    </div>
+                    <div class="col-lg-6 form-group-lg text-center">
+                        <button id="upload-photo" type="submit" class="btn btn-lg btn-success">Upload Photo</button>
+                    </div>
+                </div>
+                {% block message %} 
+                {% endblock %}
+            </div>
+        </div>
+    </body>
+</html>
