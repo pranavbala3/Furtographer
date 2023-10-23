@@ -1,0 +1,31 @@
+{% extends "index.html" %}
+{% block content %}
+    <div>
+        <button id="camera-toggle" class="btn btn-lg btn-primary">Turn Camera On</button>
+    </div>
+    <div id="camera-frame">
+        <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
+    </div>
+    <script>
+        // Initialize camera status (camera initially off)
+        let isCameraOn = false;
+        // Function to toggle the camera on and off
+        function toggleCamera() {
+            const cameraFrame = document.getElementById('camera-frame');
+
+            if (isCameraOn) {
+                // Hide camera frame
+                cameraFrame.style.display = 'none';
+                document.getElementById('camera-toggle').textContent = 'Turn Camera On';
+                isCameraOn = false;
+            } else {
+                // Show camera frame
+                cameraFrame.style.display = 'block';
+                document.getElementById('camera-toggle').textContent = 'Turn Camera Off';
+                isCameraOn = true;
+            }
+        }
+        // Add click event handler to the camera toggle button
+        document.getElementById('camera-toggle').addEventListener('click', toggleCamera);
+    </script>
+{% endblock%}

@@ -22,9 +22,13 @@ def generate_frames():
 def index():
     return render_template('index.html')
 
-@app.route('/video_feed')
-def video_feed():
+@app.route('/video')
+def video():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/take_photo')
+def take_photo():
+    return render_template('take_photo.html', title='Take Photo')
 
 if __name__ == "__main__":
     app.run(debug=True)
