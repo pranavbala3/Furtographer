@@ -14,5 +14,5 @@ export FLASK_APP=hello
 export FLASK_ENV=development
 flask run
 ```
-
+The application will run locally on the URL http://127.0.0.1:5000/
 
