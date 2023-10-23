@@ -2,7 +2,7 @@
 CSDS 393: Software Engineering Project
 
 ## Setup
-need to install Flask
+To install Flask
 ```
 pip install Flask
 ```
