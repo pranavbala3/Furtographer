@@ -1,14 +1,17 @@
 {% extends "index.html" %}
 {% block content %}
     <div id="camera-container">
-        <button id="camera-toggle" class="btn btn-lg btn-primary">Turn Camera On</button>
         <div id="camera-frame">
             <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
         </div>
+        <form method="POST" enctype="multipart/form-data" action="/tasks">
+            <button type="submit" class="btn btn-lg btn-primary" name="click" value="Capture">Capture</button>
+        </form>
+        <button id="camera-toggle" class="btn btn-lg btn-primary">Turn Camera On</button>
     </div>
     <script>
         // Initialize camera status
-        let isCameraOn = true;
+        let isCameraOn = false;
         // Function to toggle the camera on and off
         function toggleCamera() {
             const cameraFrame = document.getElementById('camera-frame');
