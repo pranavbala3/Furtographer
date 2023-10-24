@@ -4,7 +4,6 @@ import cv2
 app = Flask(__name__)
 
 def generate_frames():
-    
     while True:
         camera = cv2.VideoCapture(0)
         success, frame = camera.read()
@@ -42,7 +41,7 @@ def upload():
     if file.filename == '':
         return 'No selected file'
     if file:
-        # for now, just going to this folder, but we will need to connect this to our db/image storage system
+        # for now, the file isjust going to this directory, but we will need to connect this to our db/image storage system
         file.save("uploads/" + file.filename)
         return 'File uploaded successfully'
 
