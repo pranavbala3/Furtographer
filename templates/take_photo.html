@@ -1,14 +1,14 @@
 {% extends "index.html" %}
 {% block content %}
-    <div>
+    <div id="camera-container">
         <button id="camera-toggle" class="btn btn-lg btn-primary">Turn Camera On</button>
-    </div>
-    <div id="camera-frame">
-        <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
+        <div id="camera-frame">
+            <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
+        </div>
     </div>
     <script>
-        // Initialize camera status (camera initially off)
-        let isCameraOn = false;
+        // Initialize camera status
+        let isCameraOn = true;
         // Function to toggle the camera on and off
         function toggleCamera() {
             const cameraFrame = document.getElementById('camera-frame');
