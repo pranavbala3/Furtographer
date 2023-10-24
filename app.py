@@ -1,12 +1,12 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 import cv2
 
 app = Flask(__name__)
 
-camera = cv2.VideoCapture(0)
-
 def generate_frames():
+    
     while True:
+        camera = cv2.VideoCapture(0)
         success, frame = camera.read()
         if not success:
             break
@@ -30,5 +30,21 @@ def video():
 def take_photo():
     return render_template('take_photo.html', title='Take Photo')
 
-if __name__ == "__main__":
+@app.route('/upload_photo')
+def upload_photo():
+    return render_template('upload_photo.html', title='Upload Photo')
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    if 'file' not in request.files:
+        return 'No file part'
+    file = request.files['file']
+    if file.filename == '':
+        return 'No selected file'
+    if file:
+        # for now, just going to this folder, but we will need to connect this to our db/image storage system
+        file.save("uploads/" + file.filename)
+        return 'File uploaded successfully'
+
+if __name__ == '__main__':
     app.run(debug=True)
