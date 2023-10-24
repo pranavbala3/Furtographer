@@ -10,7 +10,7 @@ pip install Flask
 ## Instructions
 To run the web app
 ```
-export FLASK_APP=hello
+export FLASK_APP=app
 export FLASK_ENV=development
 flask run
 ```
