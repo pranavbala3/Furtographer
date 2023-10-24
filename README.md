@@ -17,7 +17,7 @@
 
    If you have *make*: `make setup`
 
-   Or run: `python get_datesets.py` and `python get_bottleneck_features.py`
+   Or run `python get_datesets.py` and `python get_bottleneck_features.py`
 
 5. Begin predicting with:
 
