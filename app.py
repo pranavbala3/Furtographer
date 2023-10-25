@@ -16,12 +16,13 @@ except OSError as error:
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test2.db'
 db = SQLAlchemy(app)
 
 class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(200), nullable=False)
+    breed = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Integer, default=0)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -91,7 +92,8 @@ def upload():
 def collection():
     if request.method == 'POST':
         task_content = request.form['content']
-        new_furto = Collection(content=task_content)
+        task_breed = request.form['breed']
+        new_furto = Collection(content=task_content, breed=task_breed)
 
         try:
             db.session.add(new_furto)
@@ -120,6 +122,7 @@ def update(id):
 
     if request.method == 'POST':
         furto.content = request.form['content']
+        furto.breed = request.form['breed']
 
         try:
             db.session.commit()

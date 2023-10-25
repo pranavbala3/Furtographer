@@ -17,6 +17,11 @@ body, html {
     width: 600px;
 }
 
+.breed {
+    margin: 0 auto ;
+    width: 480px;
+}
+
 table, td, th {
     border: 1px solid #000000;
 }

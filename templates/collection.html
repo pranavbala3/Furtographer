@@ -14,8 +14,9 @@
 
 <div class="content">
     <form action="/collection" method="POST">
-        <input type="text" name="content" id="content">
-        <input type="submit" value="Add Furto">
+        <input type="text" name="content" id="content" placeholder="Pup Name...">
+        <input type="text" name="breed" id="breed" class="breed" placeholder="Breed">
+        <input type="submit" value="Add Furto, Breed">
     </form>
     {% if tasks|length < 1 %}
     <h4 style="text-align: center;"> No Furtos Added :( Add your furry friend above! </h4> 
@@ -24,6 +25,7 @@
     <table>
         <tr>
             <th>Friend:</th>
+            <th>Breed:</th>
             <th>Captured:</th>
             <th>Actions:</th>
         </tr>
@@ -31,7 +33,8 @@
         {% for task in tasks %}
             <tr>
                 <td>{{ task.content }}</td>
-                <td>{{ task.date_created }}</td>
+                <td>{{ task.breed }}</td>
+                <td>{{ task.date_created.date() }}</td>
                 <td>
                     <a href="/delete/{{task.id}}">Delete</a>
                     <br>
