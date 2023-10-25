@@ -1,7 +1,10 @@
-from flask import Flask, render_template, Response, request
+from flask import Flask, render_template, Response, request, redirect
 import cv2
 import datetime
 import os
+
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 global capture
 capture = 0
@@ -12,6 +15,19 @@ except OSError as error:
     pass
 
 app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+db = SQLAlchemy(app)
+
+class Collection(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.String(200), nullable=False)
+    completed = db.Column(db.Integer, default=0)
+    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return '<Task %r>' % self.id
+
 
 def generate_frames():
     global capture
@@ -70,6 +86,48 @@ def upload():
         # for now, the file isjust going to this directory, but we will need to connect this to our db/image storage system
         file.save("uploads/" + file.filename)
         return 'File uploaded successfully'
+    
+@app.route('/collection', methods=['POST', 'GET'])
+def collection():
+    if request.method == 'POST':
+        task_content = request.form['content']
+        new_furto = Collection(content=task_content)
+
+        try:
+            db.session.add(new_furto)
+            db.session.commit()
+            return redirect('/collection')
+        except:
+            return 'There was an issue adding your furto! Sorry!'
+    else:
+        tasks = Collection.query.order_by(Collection.date_created).all()
+        return render_template('collection.html', title='View Collection', tasks=tasks)
+
+@app.route('/delete/<int:id>')
+def delete(id):
+    furto_to_delete = Collection.query.get_or_404(id)
+
+    try:
+        db.session.delete(furto_to_delete)
+        db.session.commit()
+        return redirect('/collection')
+    except:
+        return 'There was a problem deleting that task'
+    
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def update(id):
+    furto = Collection.query.get_or_404(id)
+
+    if request.method == 'POST':
+        furto.content = request.form['content']
+
+        try:
+            db.session.commit()
+            return redirect('/collection')
+        except:
+            return 'There was an issue updating your furto, so sorry!'
+    else:
+        return render_template('update.html', task=furto)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -5,3 +5,41 @@
     align-items: center;
     height: 100vh;
 }
+
+body, html {
+    margin: 0;
+    font-family: sans-serif;
+    background-color: rgb(255, 255, 255);
+}
+
+.content {
+    margin: 0 auto ;
+    width: 600px;
+}
+
+table, td, th {
+    border: 1px solid #000000;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    height: 30px;
+    text-align: center;
+}
+
+td {
+    text-align: center;
+    padding: 5px;
+}
+
+.form {
+    margin-top: 20px;
+}
+
+#content {
+    width: 80%;
+}
