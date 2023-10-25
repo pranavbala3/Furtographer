@@ -16,18 +16,26 @@
     </div>
 </div>
 
-<div class="content">
+<div class="login-content">
     <form action="/login" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" name="username" id="username" placeholder="Enter your username">
-        <label for="password">Password:</label>
-        <input type="password" name="password" id="password" placeholder="Enter your password">
-        <input type="submit" value="Log In">
+        <div style="text-align: center;">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" placeholder="Enter your username">
+        </div>
+        <div style="text-align: center;">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" placeholder="Enter your password">
+        </div>
+        <br></br>
+        <div style="text-align: center;">
+            <button type="submit">Log In</button>
+        </div>        
     </form>
     {% if login_failed %}
         <p style="color: red; text-align: center;">Login failed. Please check your username and password.</p>
     {% endif %}
 
+    <br></br>
     <p style="text-align: center;">Don't have an account? <a href="/register">Register Here</a></p>
 </div>
 {% endblock %}

@@ -56,12 +56,21 @@ td {
     color: #fff;
 }
 
+.login-content {
+    margin: 0 auto;
+    width: 100%;
+}
+
 .delete-button {
     background-color: red;
 }
 
 .update-button {
     background-color: blue;
+}
+
+.login-button {
+    background-color: green;
 }
 
 .form {
