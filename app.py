@@ -1,16 +1,19 @@
 from flask import Flask, render_template, Response, request, redirect
 import cv2
-import datetime
 import os
-
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+import datetime as dt
 
 global capture
 capture = 0
 
 try:
     os.mkdir('./photos')
+except OSError as error:
+    pass
+
+try:
+    os.mkdir('./uploads')
 except OSError as error:
     pass
 
@@ -24,11 +27,10 @@ class Collection(db.Model):
     content = db.Column(db.String(200), nullable=False)
     breed = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Integer, default=0)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    date_created = db.Column(db.DateTime, default=dt.datetime.utcnow)
 
     def __repr__(self):
         return '<Task %r>' % self.id
-
 
 def generate_frames():
     global capture
@@ -46,9 +48,14 @@ def generate_frames():
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         if(capture):
             capture=0
-            now = datetime.datetime.now()
-            p = os.path.sep.join(['photos', "photo_{}.png".format(str(now).replace(":",''))])
+            now = dt.datetime.now()
+            p = os.path.sep.join(['./photos', "photo_{}.jpg".format(str(now).replace(":",''))])
+            print(p)
+            print(type(frame))
+            # p = os.path.sep.join(['photos', "photo_1.png"])
+            # print(str(p))
             cv2.imwrite(p, frame)
+            print("passed x2")
 
 @app.route('/')
 def index():
@@ -67,7 +74,7 @@ def tasks():
     if request.method == 'POST':
             if request.form.get('click') == 'Capture':
                 global capture
-                capture=1
+                capture=1               
                 return "photo captured"
             else:
                 return "fail"
