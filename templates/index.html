@@ -33,6 +33,10 @@
 
         <div class="jumbotron">
             <div class="container">
+                {% if logged_in %}
+                <h1 class="text-center">Welcome, {{ current_user }}!</h1>
+                <a href="/logout">Logout</a>
+                {% endif %}
                 <h1 class="text-center">Furtographer</h1>
                 <p class="text-center">What breed is this dog?</p>
                 <hr />
