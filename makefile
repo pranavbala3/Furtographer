@@ -14,3 +14,6 @@ train: $(PY_FILES)
 
 format: $(PY_FILES)
 	$(PY_FORMATER) --in-place $(PY_FILES)
+
+count_lines:
+	find . -name '*.py' -not -path './env/**'| xargs wc -l
