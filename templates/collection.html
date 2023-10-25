@@ -36,9 +36,12 @@
                 <td>{{ task.breed }}</td>
                 <td>{{ task.date_created.date() }}</td>
                 <td>
-                    <a href="/delete/{{task.id}}">Delete</a>
-                    <br>
-                    <a href="/update/{{task.id}}">Update</a>
+                    <div class="button-container">
+                        <a href="/update/{{task.id}}"><button class="update-button" type="button">Update</button></a>
+                    </div>
+                    <div class="button-container">
+                        <a href="/delete/{{task.id}}"><button class="delete-button" type="button">Delete</button></a>
+                    </div>
                 </td>
             </tr>
         {% endfor %}
