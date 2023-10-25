@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+<div class="jumbotron">
+    <div class="container">
+        <br></br>
+        <h1 class="text-center">Your Gallery</h1>
+        <p class="text-center">See all your past Furtos</p>
+    </div>
+</div>
+
+<div class="content">
+    <form action="/collection" method="POST">
+        <input type="text" name="content" id="content" placeholder="Pup Name...">
+        <input type="text" name="breed" id="breed" class="breed" placeholder="Breed">
+        <input type="submit" value="Add Furto, Breed">
+    </form>
+    {% if tasks|length < 1 %}
+    <h4 style="text-align: center;"> No Furtos Added :( Add your furry friend above! </h4> 
+    {% else %}
+
+    <table>
+        <tr>
+            <th>Friend:</th>
+            <th>Breed:</th>
+            <th>Captured:</th>
+            <th>Actions:</th>
+        </tr>
+        <br>
+        {% for task in tasks %}
+            <tr>
+                <td>{{ task.content }}</td>
+                <td>{{ task.breed }}</td>
+                <td>{{ task.date_created.date() }}</td>
+                <td>
+                    <a href="/delete/{{task.id}}">Delete</a>
+                    <br>
+                    <a href="/update/{{task.id}}">Update</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>
+{% endblock %}
