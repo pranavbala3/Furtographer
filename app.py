@@ -1,8 +1,12 @@
-from flask import Flask, render_template, Response, request, redirect
+
 import cv2
-import os
-from flask_sqlalchemy import SQLAlchemy
 import datetime as dt
+from flask import Flask, render_template, Response, request, redirect
+from flask_sqlalchemy import SQLAlchemy
+import numpy as np
+import os
+
+
 
 global capture
 capture = 0
@@ -41,21 +45,17 @@ def generate_frames():
             break
         else:
             ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
-            frame = buffer.tobytes()
+            frame_buffer = buffer.tobytes()
             if not ret:
                 continue
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n')
         if(capture):
             capture=0
+            frame_np = np.asarray(frame)
             now = dt.datetime.now()
-            p = os.path.sep.join(['./photos', "photo_{}.jpg".format(str(now).replace(":",''))])
-            print(p)
-            print(type(frame))
-            # p = os.path.sep.join(['photos', "photo_1.png"])
-            # print(str(p))
-            cv2.imwrite(p, frame)
-            print("passed x2")
+            p = os.path.sep.join(['photos', "photo_{}.jpg".format(str(now).replace(":",''))])
+            cv2.imwrite(p, frame_np)
 
 @app.route('/')
 def index():
