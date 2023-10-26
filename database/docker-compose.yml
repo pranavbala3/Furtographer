@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  furto_postgres_db:
+    image: "postgres:16-alpine"
+    container_name: "furtographer-postgress-db"
+    environment:
+      - "POSTGRES_USER=admin"
+      - "POSTGRES_PASSWORD=password"
+      - "POSTGRES_DB=furtographer"
+    restart: "always"
+    ports:
+      - "0.0.0.0:5431:5432"
+    healthcheck:
+      test: "pg_isready --host=localhost --post=5432 --username=admin --dbname=furtographer --timeout=3"
+      interval: "1s"
+      timeout: "5s"
+      retries: 10
+
+  furto_flyway:
+    depends_on:
+      furto_postgres_db:
+        condition: "service_healthy"
+    image: "flyway/flyway:latest"
+    container_name: "furtographer-flyway"
+    command: "migrate"
+    environment: 
+      - "FLYWAY_USER=admin"
+      - "FLYWAY_PASSWORD=password"
+      - "FLYWAY_CONFIG_FILES=/flyway/scripts/flyway.conf"
+    volumes:
+      - "${PWD}/sql:/flyway/sql"
+      - "${PWD}/scripts:/flyway/scripts"
