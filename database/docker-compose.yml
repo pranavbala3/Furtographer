@@ -2,7 +2,7 @@ version: '3'
 
 services:
   furto_postgres_db:
-    image: "postgres:16-alpine"
+    image: "postgres:15-alpine"
     container_name: "furtographer-postgress-db"
     environment:
       - "POSTGRES_USER=admin"
@@ -12,7 +12,7 @@ services:
     ports:
       - "0.0.0.0:5431:5432"
     healthcheck:
-      test: "pg_isready --host=localhost --post=5432 --username=admin --dbname=furtographer --timeout=3"
+      test: "pg_isready --host=localhost --port=5432 --username=admin --dbname=furtographer --timeout=3"
       interval: "1s"
       timeout: "5s"
       retries: 10
