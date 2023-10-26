@@ -1,16 +1,20 @@
-from flask import Flask, render_template, Response, request, redirect, session, current_app
 import cv2
-import datetime
-import os
-
+import datetime as dt
+from flask import Flask, render_template, Response, request, redirect
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+import numpy as np
+import os
 
 global capture
 capture = 0
 
 try:
     os.mkdir('./photos')
+except OSError as error:
+    pass
+
+try:
+    os.mkdir('./uploads')
 except OSError as error:
     pass
 
@@ -27,11 +31,10 @@ class Collection(db.Model):
     content = db.Column(db.String(200), nullable=False)
     breed = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Integer, default=0)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    date_created = db.Column(db.DateTime, default=dt.datetime.utcnow)
 
     def __repr__(self):
         return '<Task %r>' % self.id
-
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -49,7 +52,6 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
-
 def generate_frames():
     global capture
     while True:
@@ -58,18 +60,18 @@ def generate_frames():
         if not success:
             break
         else:
-            ret, buffer = cv2.imencode('.jpg', cv2.flip(frame, 1))
-            frame = buffer.tobytes()
+            ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
+            frame_buffer = buffer.tobytes()
             if not ret:
                 continue
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        if (capture):
-            capture = 0
-            now = datetime.datetime.now()
-            p = os.path.sep.join(
-                ['photos', "photo_{}.png".format(str(now).replace(":", ''))])
-            cv2.imwrite(p, frame)
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n')
+        if(capture):
+            capture=0
+            frame_np = np.asarray(frame)
+            now = dt.datetime.now()
+            p = os.path.sep.join(['photos', "photo_{}.jpg".format(str(now).replace(":",''))])
+            cv2.imwrite(p, frame_np)
 
 
 @app.route('/')
@@ -156,7 +158,6 @@ def tasks():
         else:
             return "fail"
 
-
 @app.route('/upload_photo')
 def upload_photo():
     return render_template('upload_photo.html', title='Upload Photo')
@@ -170,7 +171,7 @@ def upload():
     if file.filename == '':
         return 'No selected file'
     if file:
-        # for now, the file isjust going to this directory, but we will need to connect this to our db/image storage system
+        # for now, the file is just going to this directory, but we will need to connect this to our db/image storage system
         file.save("uploads/" + file.filename)
         return 'File uploaded successfully'
 
