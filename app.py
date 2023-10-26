@@ -1,12 +1,9 @@
-
 import cv2
 import datetime as dt
 from flask import Flask, render_template, Response, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import os
-
-
 
 global capture
 capture = 0
