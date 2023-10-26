@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+<div class="jumbotron">
+    <div class="container">
+        <br></br>
+        <h1 class="text-center">Register</h1>
+    </div>
+</div>
+
+<div class="content">
+    <form action="/register" method="POST">
+        <div style="text-align: center;">
+            <label for="username">Username:</label>
+            <input type="text" name="username" id="username" placeholder="Choose a username">
+        </div>
+        <div style="text-align: center;">
+            <label for="password">Password:</label>
+            <input type="password" name="password" id="password" placeholder="Choose a password">
+        </div>
+        <div style="text-align: center;">
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm your password">
+        </div>
+        <br></br>
+        <div style="text-align: center;">
+            <button type="submit">Register</button>
+        </div>
+    </form>
+    
+    {% if registration_failed %}
+        <p style="color: red; text-align: center;">Registration failed. Please try again.</p>
+    {% endif %}
+    <br></br>
+    <p style="text-align: center;">Already have an account? <a href="/login">Log in</a></p>
+</div>
+{% endblock %}

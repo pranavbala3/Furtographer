@@ -6,23 +6,26 @@
     height: 100vh;
 }
 
-body, html {
+body,
+html {
     margin: 0;
     font-family: sans-serif;
     background-color: rgb(255, 255, 255);
 }
 
 .content {
-    margin: 0 auto ;
+    margin: 0 auto;
     width: 600px;
 }
 
 .breed {
-    margin: 0 auto ;
+    margin: 0 auto;
     width: 480px;
 }
 
-table, td, th {
+table,
+td,
+th {
     border: 1px solid #000000;
 }
 
@@ -39,6 +42,35 @@ th {
 td {
     text-align: center;
     padding: 5px;
+}
+
+.button-container {
+    width: 100px;
+    /* Set your desired width */
+    margin: 0 auto;
+    /* Center the content horizontally */
+}
+
+.button-container button {
+    width: 100%;
+    color: #fff;
+}
+
+.login-content {
+    margin: 0 auto;
+    width: 100%;
+}
+
+.delete-button {
+    background-color: red;
+}
+
+.update-button {
+    background-color: blue;
+}
+
+.login-button {
+    background-color: green;
 }
 
 .form {
