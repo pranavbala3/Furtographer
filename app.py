@@ -88,7 +88,7 @@ def upload():
     if file.filename == '':
         return 'No selected file'
     if file:
-        # for now, the file isjust going to this directory, but we will need to connect this to our db/image storage system
+        # for now, the file is just going to this directory, but we will need to connect this to our db/image storage system
         file.save("uploads/" + file.filename)
         return 'File uploaded successfully'
     
