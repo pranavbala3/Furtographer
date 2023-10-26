@@ -5,6 +5,9 @@ from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import os
 
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
 global capture
 capture = 0
 
