@@ -4,7 +4,7 @@
 
 2. Start environment:
 
-   **\*NIX:** `source env/bin/activte`
+   **\*NIX:** `source env/bin/activate`
 
    **Windows:**
 
