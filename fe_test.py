@@ -45,9 +45,9 @@ def test_login_failure(client):
 # Sample test for adding a new item to the collection
 def test_add_to_collection(client):
     response = client.post('/collection', data={'content': 'Test Item', 'breed': 'Test Breed'})
-    assert b'Task added!' in response.data
     print("HERE")
     print(response.data)
+    assert b'Task added!' in response.data
     assert Collection.query.count() == 1
 
 # Sample test for capturing a photo
