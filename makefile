@@ -2,6 +2,7 @@ PY := python
 PY_FORMATER := autopep8
 PY_FILES := $(shell find . -name '*.py' -not -path "./env/*")
 NETS := nets
+TESTS := $(NETS)
 
 setup:
 	$(PY) get_datasets.py
@@ -13,11 +14,8 @@ predict: $(PY_FILES)
 train: $(PY_FILES)
 	$(PY) $(NETS)/train.py
 
-test_breeds: $(PY_FILES)
-	$(PY) $(NETS)/test_breeds.py
-
-test_detector: $(PY_FILES)
-	$(PY) $(NETS)/test_detector.py
+test_%:
+	$(PY) $(TESTS)/$@.py
 
 format: $(PY_FILES)
 	$(PY_FORMATER) --in-place $(PY_FILES)
