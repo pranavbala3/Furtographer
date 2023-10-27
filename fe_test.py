@@ -2,7 +2,6 @@
 from app import app, db, Collection
 import pytest
 # Initialize the app for testing
-@pytest.fixture
 
 # Test that the website works
 def test_home_page():
@@ -10,6 +9,7 @@ def test_home_page():
     response = client.get('/')
     assert response.status_code == 200
 
+@pytest.fixture
 def client():
     app.config['TESTING'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test_db.db'  # Use a test database
