@@ -153,6 +153,7 @@ def tasks():
         if request.form.get('click') == 'Capture':
             global capture
             capture = 1
+            generate_frames()
             return "photo captured"
         else:
             return "fail"
