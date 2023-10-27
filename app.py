@@ -93,7 +93,6 @@ def login():
             return redirect('/')
         else:
             return render_template('login.html', login_failed=True)
-
     return render_template('login.html')
 
 

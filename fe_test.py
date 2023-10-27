@@ -26,10 +26,21 @@ def test_index_page(client):
     assert response.status_code == 200
     assert b'Welcome to Your App' in response.data
 
+
 # Sample test for the login page
-def test_login(client):
+def test_logins(client):
+    client.post('/register', data={'username': 'testuser', 'password': 'testpassword', 'confirm_password': 'testpassword'})
     response = client.post('/login', data={'username': 'testuser', 'password': 'testpassword'})
-    assert b'Login Successful' in response.data
+    print("HERE")
+    print(response.data)
+    assert response.location == '/'
+
+def test_login_failure(client):
+    response = client.post('/login', data={'username': 'testuser', 'password': 'wrongpassword'})
+    print("HERE")
+    print(response.data)
+    assert response.status_code == 200  # Check for a non-redirect
+    assert b'Login failed' in response.data  # Check for specific content in the response
 
 # Sample test for adding a new item to the collection
 def test_add_to_collection(client):
