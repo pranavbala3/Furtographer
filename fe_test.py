@@ -24,7 +24,7 @@ def client():
 def test_index_page(client):
     response = client.get('/')
     assert response.status_code == 200
-    assert b'Welcome to Your App' in response.data
+    assert b'What breed is this dog?' in response.data
 
 
 # Sample test for the login page
@@ -46,6 +46,8 @@ def test_login_failure(client):
 def test_add_to_collection(client):
     response = client.post('/collection', data={'content': 'Test Item', 'breed': 'Test Breed'})
     assert b'Task added!' in response.data
+    print("HERE")
+    print(response.data)
     assert Collection.query.count() == 1
 
 # Sample test for capturing a photo

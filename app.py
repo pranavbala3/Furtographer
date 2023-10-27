@@ -182,7 +182,6 @@ def collection():
         task_content = request.form['content']
         task_breed = request.form['breed']
         new_furto = Collection(content=task_content, breed=task_breed)
-
         try:
             db.session.add(new_furto)
             db.session.commit()
