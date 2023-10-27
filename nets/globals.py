@@ -2,6 +2,7 @@ import os
 from glob import glob
 
 project_dir = os.getcwd()
+default_saved_model_name = '20231024-best_weights_resnet50.hdf5'
 dataset_dir = os.path.join(project_dir, "datasets")
 dog_data_dir = os.path.join(dataset_dir, "dogImages")
 faces_data_dir = os.path.join(dataset_dir, "lfw")

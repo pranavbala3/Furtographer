@@ -14,8 +14,8 @@ from globals import (
 from loader import (
     load_model,
     load_bottling_model,
+    load_dataset
 )
-from data_processing import load_dataset
 
 
 # load train, test, and validation datasets
