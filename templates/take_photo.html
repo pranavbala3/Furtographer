@@ -29,6 +29,8 @@
         function showModal() {
             var modal = document.getElementById('myModal');
             modal.style.display = 'block';
+
+            document.body.style.overflow = 'hidden';
         }
 
         // click event handlers for the save and retake buttons
@@ -48,6 +50,8 @@
         function closeModal() {
             var modal = document.getElementById('myModal');
             modal.style.display = 'none';
+
+            document.body.style.overflow = 'auto';
         }
         
         function showBlur() {
