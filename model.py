@@ -38,15 +38,20 @@ def is_dog(img_path, detector_model):
     return ((prediction <= 268) & (prediction >= 151))
 
 
-def detect_and_predict_breed(img_path, detector_model, bottling_model, model):
+def detect_and_predict_breed_with_display(img_path, detector_model, bottling_model, model):
     if in_jupyter:
         display(Image(img_path, width=300))
-    if is_dog(img_path, detector_model):
-        breed = predict_breed(img_path, bottling_model, model).split('.')[-1]
+    breed = detect_and_predict_breed(img_path, detector_model, bottling_model, model);
+    if breed:
         print(f'The predicted breed of dog in this image is {breed}')
     else:
         print("no dog in the image")
 
+def detect_and_predict_breed(img_path, detector_model, bottling_model, model):
+    if is_dog(img_path, detector_model):
+        breed = predict_breed(img_path, bottling_model, model).split('.')[-1]
+        return breed;
+    return None
 
 if __name__ == "__main__":
     path = sys.argv[1]
@@ -58,4 +63,4 @@ if __name__ == "__main__":
     bottling_model = load_bottling_model()
     model = load_model(bottling_model,
                        name='20231024-best_weights_resnet50.hdf5')
-    detect_and_predict_breed(path, detector_model, bottling_model, model)
+    detect_and_predict_breed_with_display(path, detector_model, bottling_model, model)
