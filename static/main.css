@@ -19,8 +19,23 @@ html {
 }
 
 .body-blur {
-    filter: blur(5px); /* Adjust the blur intensity as needed */
-    transition: filter 0.3s ease; /* Add a smooth transition effect */
+    overflow: hidden;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    backdrop-filter: blur(5px);
+    z-index: 1;
+    display: none;
+}
+
+#camera-container {
+    position: relative;
 }
 
 .breed {
@@ -51,9 +66,7 @@ td {
 
 .button-container {
     width: 100px;
-    /* Set your desired width */
     margin: 0 auto;
-    /* Center the content horizontally */
 }
 
 .button-container button {
@@ -78,17 +91,19 @@ td {
     transform: translate(-50%, -50%);
     background-color: #fefefe;
     border: 1px solid #888;
-    width: 400px; /* Set width and height to the same value to make it square */
-    height: 400px; /* Set height to the same value to make it square */
+    width: 400px;
+    height: 400px;
     text-align: center;
-    border-radius: 10px; /* Set the border-radius for rounded corners */
+    border-radius: 10px;
+    z-index: 3;
 }
 
 .modal-content {
-    width: 100%; /* Make the content fill the width of the modal */
-    height: 100%; /* Make the content fill the height of the modal */
-    padding: 30px; /* Increase padding for a larger content area */
+    width: 100%;
+    height: 100%;
+    padding: 30px;
     margin: 0;
+    z-index: 3;
 }
 
 .update-button {
