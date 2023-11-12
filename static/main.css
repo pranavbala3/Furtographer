@@ -106,6 +106,13 @@ td {
     z-index: 3;
 }
 
+.modal-btns {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 95%;
+}
+
 .update-button {
     background-color: blue;
 }

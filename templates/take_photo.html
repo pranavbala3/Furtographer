@@ -13,12 +13,14 @@
         <div id="myModal" class="modal">
             <div class="modal-content">
                 <p>Do you want to save the picture or retake?</p>
-                <form method="POST" enctype="multipart/form-data" action="/tasks">
-                    <button id="saveBtn" class="btn btn-sm btn-primary" name="click" value="Save">Save</button>
-                </form>
-                <form method="POST" enctype="multipart/form-data" action="/tasks">
-                    <button id="retakeBtn" class="btn btn-sm btn-primary" name="click" value="Retake">Retake</button>
-                </form>
+                <div class="modal-btns">
+                    <form method="POST" enctype="multipart/form-data" action="/tasks">
+                        <button id="saveBtn" class="btn btn-sm btn-primary" name="click" value="Save">Save</button>
+                    </form>
+                    <form method="POST" enctype="multipart/form-data" action="/tasks">
+                        <button id="retakeBtn" class="btn btn-sm btn-primary" name="click" value="Retake">Retake</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
