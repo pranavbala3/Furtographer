@@ -19,7 +19,11 @@ detector = load_detector_model()
 model = load_model(bottler, default_saved_model_name)
 
 global capture
+global save
+global retake
 capture = 0
+save = 0
+retake = 0
 
 try:
     os.mkdir('./photos')
@@ -67,6 +71,8 @@ with app.app_context():
 
 def generate_frames():
     global capture
+    global save
+    global retake
     while True:
         camera = cv2.VideoCapture(0)
         success, frame = camera.read()
@@ -81,17 +87,22 @@ def generate_frames():
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n')
         if(capture):
             capture=0
-            frame_np = np.asarray(frame)
-            now = dt.datetime.now()
-            p = os.path.sep.join(['photos', "photo_{}.jpg".format(str(now).replace(":",''))])
-            cv2.imwrite(p, frame_np)
-
+            while(not save and not retake):
+                pass
+            if(save):
+                frame_np = np.asarray(frame)
+                now = dt.datetime.now()
+                p = os.path.sep.join(['photos', "photo_{}.jpg".format(str(now).replace(":",''))])
+                cv2.imwrite(p, frame_np)
+                save = 0
+            elif(retake):
+                retake = 0
+    camera.release()
 
 @app.route('/')
 def index():
     logged_in = 'username' in session
     return render_template('index.html', logged_in=logged_in, current_user=session.get('username'))
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -169,6 +180,14 @@ def tasks():
             generate_frames()
             # Trigger the display message
             return render_template('take_photo.html', show_modal=True)
+        elif request.form.get('click') == 'Save':
+            global save
+            save = 1
+            return render_template('take_photo.html', show_modal=False)
+        elif request.form.get('click') == 'Retake':
+            global retake
+            retake = 1
+            return render_template('take_photo.html', show_modal=False)        
         else:
             return "fail"
     return render_template('take_photo.html', show_modal=False)

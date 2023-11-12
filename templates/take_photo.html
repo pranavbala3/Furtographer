@@ -1,19 +1,25 @@
 {% extends "index.html" %}
 {% block content %}
-    <div id="camera-container">
-        <div id="camera-frame">
-            <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
+    <div id="overlay" class="body-blur"></div>
+        <div id="camera-container">
+            <div id="camera-frame">
+                <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
+            </div>
+            <form method="POST" enctype="multipart/form-data" action="/tasks">
+                <button type="submit" class="btn btn-lg btn-primary" name="click" value="Capture" onclick="captureImage()">Capture</button>
+            </form>
+            <button id="camera-toggle" class="btn btn-lg btn-primary">Turn Camera On</button>
         </div>
-        <form method="POST" enctype="multipart/form-data" action="/tasks">
-            <button type="submit" class="btn btn-lg btn-primary" name="click" value="Capture" onclick="captureImage()">Capture</button>
-        </form>
-        <button id="camera-toggle" class="btn btn-lg btn-primary">Turn Camera On</button>
-    </div>
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-          <p>Do you want to save the picture or retake?</p>
-          <button id="saveBtn">Save</button>
-          <button id="retakeBtn">Retake</button>
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <p>Do you want to save the picture or retake?</p>
+                <form method="POST" enctype="multipart/form-data" action="/tasks">
+                    <button id="saveBtn" class="btn btn-sm btn-primary" name="click" value="Save">Save</button>
+                </form>
+                <form method="POST" enctype="multipart/form-data" action="/tasks">
+                    <button id="retakeBtn" class="btn btn-sm btn-primary" name="click" value="Retake">Retake</button>
+                </form>
+            </div>
         </div>
     </div>
     <script>
@@ -42,13 +48,12 @@
             modal.style.display = 'none';
         }
         
-        // JavaScript to add and remove the body-blur class
         function showBlur() {
-            document.body.classList.add('body-blur');
+            document.getElementById('overlay').style.display = 'block';
         }
 
         function hideBlur() {
-            document.body.classList.remove('body-blur');
+            document.getElementById('overlay').style.display = 'none';
         }
 
         // Function to capture image and show modal
@@ -60,6 +65,7 @@
 
         {% if show_modal %}
             showModal();
+            showBlur();
         {% endif %}
         
         // Initialize camera status
