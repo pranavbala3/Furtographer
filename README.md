@@ -49,6 +49,16 @@ docker-compose --file docker-compose.yml down
     ```
     docker-compose run --rm furto_flyway migrate
     ```
-1. Or, execute sql script(s) from a database management tool. 
+1. Or, execute sql script(s) from a database management tool.
 
+## For Training and Predicting
 
+1. Download datasets:
+
+    `make setup_training`
+
+    Look at `train.ipynb` for example training.
+
+2. Begin predicting with:
+
+   `make predict IMG=*path*`

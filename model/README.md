@@ -13,20 +13,17 @@
        In *powershell:* `env\Scripts\Activate.ps1`
 
 3. Install requirements: *pip install -r requirements.txt*
+
+## For Web Application
+
+4. Run `flask run`
+
+## For Training and Predicting
+
 4. Download datasets:
 
-   If you have *make*: `make setup`
-
-   Or run `python get_datesets.py` and `python get_bottleneck_features.py`
+   If you have *make*: `make setup_training`
 
 5. Begin predicting with:
 
-   `make predict IMG=*path*` or
-
-   `python model.py *path*`
-
-6. Begin training with
-
-   `make train` or
-
-   `python nets/train.py`
+   `make predict IMG=*path*`
