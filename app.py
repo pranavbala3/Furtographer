@@ -180,6 +180,7 @@ def upload():
 
 @app.route('/collection', methods=['POST', 'GET'])
 def collection():
+    logged_in = 'username' in session
     if request.method == 'POST':
         task_content = request.form['content']
         task_breed = request.form['breed']
@@ -187,12 +188,12 @@ def collection():
         try:
             db.session.add(new_furto)
             db.session.commit()
-            return redirect('/collection')
+            return redirect('/collection', logged_in=logged_in, current_user=session.get('username'))
         except:
             return 'There was an issue adding your furto! Sorry!'
     else:
         tasks = Collection.query.order_by(Collection.date_created).all()
-        return render_template('collection.html', title='View Collection', tasks=tasks)
+        return render_template('collection.html', title='View Collection', tasks=tasks, logged_in=logged_in, current_user=session.get('username'))
 
 
 @app.route('/delete/<int:id>')

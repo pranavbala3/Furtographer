@@ -26,6 +26,9 @@
             <a class ="navbar-brand" href="/login">Login</a>
             <a class ="navbar-brand" href="/register">Register</a>
             {% endif %}
+            {% if logged_in %}
+            <a class ="navbar-brand" href="/logout">Logout</a>
+            {% endif %}
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">

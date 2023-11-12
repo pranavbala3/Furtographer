@@ -6,6 +6,9 @@
 {% block body %}
 <div class="jumbotron">
     <div class="container">
+        {% if logged_in %}
+        <h1 class="text-center">Welcome, {{ current_user }}!</h1>
+        {% endif %}
         <br></br>
         <h1 class="text-center">Your Gallery</h1>
         <p class="text-center">See all your past Furtos</p>
