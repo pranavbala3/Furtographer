@@ -42,7 +42,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test2.db'
 app.config['SECRET_KEY'] = 'your_secret_key'
 db = SQLAlchemy(app)
 
-
 class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(200), nullable=False)
