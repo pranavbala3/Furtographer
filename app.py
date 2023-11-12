@@ -72,13 +72,12 @@ def generate_frames():
             now = dt.datetime.now()
             p = os.path.sep.join(['photos', "photo_{}.jpg".format(str(now).replace(":",''))])
             cv2.imwrite(p, frame_np)
-
+    camera.release()
 
 @app.route('/')
 def index():
     logged_in = 'username' in session
     return render_template('index.html', logged_in=logged_in, current_user=session.get('username'))
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
