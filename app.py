@@ -154,9 +154,11 @@ def tasks():
             global capture
             capture = 1
             generate_frames()
-            return "photo captured"
+            # Trigger the display message
+            return render_template('take_photo.html', show_modal=True)
         else:
             return "fail"
+    return render_template('take_photo.html', show_modal=False)
 
 @app.route('/upload_photo')
 def upload_photo():

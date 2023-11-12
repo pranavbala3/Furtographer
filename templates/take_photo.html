@@ -5,11 +5,63 @@
             <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
         </div>
         <form method="POST" enctype="multipart/form-data" action="/tasks">
-            <button type="submit" class="btn btn-lg btn-primary" name="click" value="Capture">Capture</button>
+            <button type="submit" class="btn btn-lg btn-primary" name="click" value="Capture" onclick="captureImage()">Capture</button>
         </form>
         <button id="camera-toggle" class="btn btn-lg btn-primary">Turn Camera On</button>
     </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+          <p>Do you want to save the picture or retake?</p>
+          <button id="saveBtn">Save</button>
+          <button id="retakeBtn">Retake</button>
+        </div>
+    </div>
     <script>
+        // show the modal
+        function showModal() {
+            var modal = document.getElementById('myModal');
+            modal.style.display = 'block';
+        }
+
+        // click event handlers for the save and retake buttons
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            // Handle saving the picture (you may want to add AJAX logic here)
+            alert('Picture saved!');
+            closeModal();
+        });
+
+        document.getElementById('retakeBtn').addEventListener('click', function() {
+            // Handle retaking the picture
+            alert('Retaking picture...');
+            closeModal();
+        });
+
+        // Add this function to close the modal
+        function closeModal() {
+            var modal = document.getElementById('myModal');
+            modal.style.display = 'none';
+        }
+        
+        // JavaScript to add and remove the body-blur class
+        function showBlur() {
+            document.body.classList.add('body-blur');
+        }
+
+        function hideBlur() {
+            document.body.classList.remove('body-blur');
+        }
+
+        // Function to capture image and show modal
+        function captureImage() {
+            // Capture logic here
+            showBlur(); // Apply blur to the page
+            showModal(); // Show the modal
+        }
+
+        {% if show_modal %}
+            showModal();
+        {% endif %}
+        
         // Initialize camera status
         let isCameraOn = false;
         // Function to toggle the camera on and off
