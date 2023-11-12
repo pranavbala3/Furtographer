@@ -8,9 +8,11 @@ import os
 global capture
 global save
 global retake
+global latest_frame
 capture = 0
 save = 0
 retake = 0
+latest_frame = None
 
 try:
     os.mkdir('./photos')
@@ -60,9 +62,12 @@ def generate_frames():
     global capture
     global save
     global retake
+    global latest_frame
+
     while True:
         camera = cv2.VideoCapture(0)
         success, frame = camera.read()
+        
         if not success:
             break
         else:
@@ -72,19 +77,25 @@ def generate_frames():
                 continue
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n')
-        if(capture):
+        if capture:
+            latest_frame = buffer
             capture=0
-            while(not save and not retake):
+            while not save and not retake:
                 pass
-            if(save):
+            if save:
                 frame_np = np.asarray(frame)
                 now = dt.datetime.now()
                 p = os.path.sep.join(['photos', "photo_{}.jpg".format(str(now).replace(":",''))])
                 cv2.imwrite(p, frame_np)
                 save = 0
-            elif(retake):
+            elif retake:
                 retake = 0
     camera.release()
+
+@app.route('/captured_frame')
+def captured_frame():
+    global latest_frame
+    return latest_frame
 
 @app.route('/')
 def index():

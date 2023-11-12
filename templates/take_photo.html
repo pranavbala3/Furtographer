@@ -13,6 +13,7 @@
         <div id="myModal" class="modal">
             <div class="modal-content">
                 <p>Do you want to save the picture or retake?</p>
+                <img id="capturedImage" style="max-width: 100%; max-height: 300px; margin-bottom: 20px;">
                 <div class="modal-btns">
                     <form method="POST" enctype="multipart/form-data" action="/tasks">
                         <button id="saveBtn" class="btn btn-sm btn-primary" name="click" value="Save">Save</button>
@@ -33,18 +34,26 @@
             document.body.style.overflow = 'hidden';
         }
 
+        function closeModal() {
+            var modal = document.getElementById('myModal');
+            modal.style.display = 'none';
+            // Revert scrolling to normal when the modal is closed
+            document.body.style.overflow = 'auto';
+        }        
+
         // click event handlers for the save and retake buttons
         document.getElementById('saveBtn').addEventListener('click', function() {
-            // Handle saving the picture (you may want to add AJAX logic here)
+            // Handle saving the picture
             alert('Picture saved!');
             closeModal();
         });
 
         document.getElementById('retakeBtn').addEventListener('click', function() {
             // Handle retaking the picture
-            alert('Retaking picture...');
+            alert('Retake!');
             closeModal();
         });
+<<<<<<< Updated upstream
 
         // Add this function to close the modal
         function closeModal() {
@@ -53,6 +62,8 @@
 
             document.body.style.overflow = 'auto';
         }
+=======
+>>>>>>> Stashed changes
         
         function showBlur() {
             document.getElementById('overlay').style.display = 'block';
@@ -64,9 +75,12 @@
 
         // Function to capture image and show modal
         function captureImage() {
-            // Capture logic here
-            showBlur(); // Apply blur to the page
-            showModal(); // Show the modal
+            showBlur();
+            showModal();
+            // Update the captured image in the modal
+            const capturedImage = document.getElementById('capturedImage');
+            capturedImage.src = '{{ url_for("captured_frame") }}';
+            capturedImage.style.display = 'block'; // Make sure the image is visible
         }
 
         {% if show_modal %}

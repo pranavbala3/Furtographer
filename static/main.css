@@ -20,6 +20,7 @@ html {
 
 .body-blur {
     overflow: hidden;
+    transition: filter 0.3s ease;
 }
 
 #overlay {
