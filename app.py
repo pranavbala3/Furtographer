@@ -4,6 +4,19 @@ from flask import Flask, render_template, Response, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import os
+from model.model import (
+    detect_and_predict_breed_from_path,
+    load_model,
+    load_detector_model,
+    load_bottling_model,
+    )
+from model.globals import (
+    default_saved_model_name
+    )
+
+bottler = load_bottling_model()
+detector = load_detector_model()
+model = load_model(bottler, default_saved_model_name)
 
 global capture
 capture = 0
