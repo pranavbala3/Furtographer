@@ -14,9 +14,9 @@ from model.globals import (
     default_saved_model_name
     )
 
-bottler = load_bottling_model()
-detector = load_detector_model()
-model = load_model(bottler, default_saved_model_name)
+# bottler = load_bottling_model()
+# detector = load_detector_model()
+# model = load_model(bottler, default_saved_model_name)
 
 global capture
 global save
@@ -72,8 +72,8 @@ def generate_frames():
     global capture
     global save
     global retake
+    camera = cv2.VideoCapture(0)
     while True:
-        camera = cv2.VideoCapture(0)
         success, frame = camera.read()
         if not success:
             break
