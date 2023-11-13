@@ -25,14 +25,18 @@ try:
     # execute the Users table creation script
     curr.execute(user_tables_script)
 
-    # read the data SQL file for Users
-    # execute the Users data SQL
+    # read from SQL script for Collections table creation
+    with open('V20231025_0823_create_table_collections.sql', 'r') as file:
+        collections_tables_script = file.read()
 
-
+    # execute the Collections table creation script
+    curr.execute(collections_tables_script)
+    
+    
 except Exception as error:
     print(error)
 finally:
     if curr is not None:
-        cur.close()
+        curr.close()
     if conn is not None:
         conn.close()

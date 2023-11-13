@@ -3,7 +3,7 @@ version: '3'
 services:
   furto_postgres_db:
     image: "postgres:15-alpine"
-    container_name: "furtographer-postgress-db"
+    container_name: "furtographer-postgres-db"
     environment:
       - "POSTGRES_USER=admin"
       - "POSTGRES_PASSWORD=password"
