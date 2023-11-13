@@ -24,9 +24,11 @@ model = load_model(bottler, default_saved_model_name)
 global capture
 global save
 global retake
+global latest_frame
 capture = 0
 save = 0
 retake = 0
+latest_frame = None
 
 try:
     os.mkdir('./photos')
@@ -76,6 +78,8 @@ def generate_frames():
     global capture
     global save
     global retake
+    global latest_frame
+
     camera = cv2.VideoCapture(0)
     while True:
         success, frame = camera.read()
@@ -86,6 +90,7 @@ def generate_frames():
             frame_buffer = buffer.tobytes()
             if not ret:
                 continue
+            latest_frame = frame_buffer
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n')
         if (capture):
@@ -103,6 +108,10 @@ def generate_frames():
                 retake = 0
     camera.release()
 
+@app.route('/captured_frame')
+def captured_frame():
+    global latest_frame
+    return Response(latest_frame, mimetype='image/jpeg')
 
 @app.route('/')
 def index():
