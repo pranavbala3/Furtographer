@@ -6,6 +6,7 @@ CSDS 393: Software Engineering Project
 ### Clone
 ```
 git clone https://github.com/pranavbala3/Furtographer.git
+cd Furtographer
 ```
 ### Virtual Environment
 ```
