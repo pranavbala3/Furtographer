@@ -3,12 +3,47 @@ CSDS 393: Software Engineering Project
 
 ## Setup Locally
 
+### Clone
 ```
 git clone https://github.com/pranavbala3/Furtographer.git
+```
+### Virtual Environment
+```
 python3 -m venv venv
-# activate venv
+```
+**\*NIX:** `source env/bin/activate`
+
+**Windows:**
+
+In *cmd.exe:* `env\Scripts\activate.bat`
+
+In *powershell:* `env\Scripts\Activate.ps1`
+
+### Insall Requirements
+```
 pip install -r requirements.txt
 ```
+
+### To Run
+(make sure running from an app that has or can have access to your systems camera)
+```
+python app.py
+```
+
+## For Training and Predicting
+
+1. Download datasets:
+
+- If You Have ```make```: `make setup_training`
+- Otherwise run
+  - ```python -m model.scripts.get_datasets```
+  - ```python -m model.scripts.get_bottleneck_features```
+
+2. Look at `train.ipynb` for example training.
+
+3. Begin predicting with:
+
+   `make predict IMG=*path*`
 
 ## Setup
 To install Flask
@@ -59,15 +94,3 @@ docker-compose --file docker-compose.yml down
     docker-compose run --rm furto_flyway migrate
     ```
 1. Or, execute sql script(s) from a database management tool.
-
-## For Training and Predicting
-
-1. Download datasets:
-
-    `make setup_training`
-
-    Look at `train.ipynb` for example training.
-
-2. Begin predicting with:
-
-   `make predict IMG=*path*`
