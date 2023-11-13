@@ -14,9 +14,9 @@ from model.globals import (
     default_saved_model_name
 )
 
-# bottler = load_bottling_model()
-# detector = load_detector_model()
-# model = load_model(bottler, default_saved_model_name)
+bottler = load_bottling_model()
+detector = load_detector_model()
+model = load_model(bottler, default_saved_model_name)
 
 global capture
 global save
@@ -206,14 +206,15 @@ def upload_photo():
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
     if 'file' not in request.files:
-        return 'No file part'
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=True)
     file = request.files['file']
     if file.filename == '':
-        return 'No selected file'
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=True)
+    
     if file:
         # for now, the file is just going to this directory, but we will need to connect this to our db/image storage system
         file.save("uploads/" + file.filename)
-        return 'File uploaded successfully'
+        return render_template('upload_photo.html', title='Upload Photo', upload=True)
 
 
 @app.route('/collection', methods=['POST', 'GET'])
