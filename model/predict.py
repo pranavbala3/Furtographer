@@ -5,7 +5,7 @@ from .model import (
     load_detector_model,
     load_bottling_model,
     detect_and_predict_breed_from_path,
-    )
+)
 
 if __name__ == "__main__":
     path = sys.argv[1]

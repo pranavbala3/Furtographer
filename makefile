@@ -4,7 +4,7 @@ MODEL := model
 TESTS := $(MODEL).tests
 SCRIPTS := $(MODEL).scripts
 PY_FORMATER := autopep8
-PY_FILES := $(shell find . -name '*.py' -not -path "./env/*")
+PY_FILES := $(shell find . -name '*.py' -not -path "./env/*" -not -path "./venv/*")
 
 setup_training:
 	$(PYM) $(SCRIPTS).get_datasets

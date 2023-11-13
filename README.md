@@ -1,6 +1,15 @@
 # Furtographer
 CSDS 393: Software Engineering Project
 
+## Setup Locally
+
+```
+git clone https://github.com/pranavbala3/Furtographer.git
+python3 -m venv venv
+# activate venv
+pip install -r requirements.txt
+```
+
 ## Setup
 To install Flask
 ```

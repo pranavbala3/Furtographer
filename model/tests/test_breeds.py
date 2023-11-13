@@ -7,7 +7,7 @@ from ..model import (
 from .test_helper import (
     load_dataset,
     load_bottleneck_features,
-    )
+)
 from ..globals import (
     default_saved_model_name,
     train_set_dir,

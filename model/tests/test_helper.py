@@ -5,7 +5,7 @@ from sklearn.datasets import load_files
 from tensorflow.keras.utils import to_categorical
 from ..globals import (
     bottleneck_features_dir
-    )
+)
 
 
 def load_dataset(path):

@@ -9,10 +9,10 @@ from model.model import (
     load_model,
     load_detector_model,
     load_bottling_model,
-    )
+)
 from model.globals import (
     default_saved_model_name
-    )
+)
 
 bottler = load_bottling_model()
 detector = load_detector_model()
@@ -42,6 +42,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test2.db'
 app.config['SECRET_KEY'] = 'your_secret_key'
 db = SQLAlchemy(app)
 
+
 class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(200), nullable=False)
@@ -51,6 +52,7 @@ class Collection(db.Model):
 
     def __repr__(self):
         return '<Task %r>' % self.id
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,6 +70,7 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
+
 def generate_frames():
     global capture
     global save
@@ -78,30 +81,33 @@ def generate_frames():
         if not success:
             break
         else:
-            ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
+            ret, buffer = cv2.imencode('.jpg', cv2.flip(frame, 1))
             frame_buffer = buffer.tobytes()
             if not ret:
                 continue
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n')
-        if(capture):
-            capture=0
-            while(not save and not retake):
+        if (capture):
+            capture = 0
+            while (not save and not retake):
                 pass
-            if(save):
+            if (save):
                 frame_np = np.asarray(frame)
                 now = dt.datetime.now()
-                p = os.path.sep.join(['photos', "photo_{}.jpg".format(str(now).replace(":",''))])
+                p = os.path.sep.join(
+                    ['photos', "photo_{}.jpg".format(str(now).replace(":", ''))])
                 cv2.imwrite(p, frame_np)
                 save = 0
-            elif(retake):
+            elif (retake):
                 retake = 0
     camera.release()
+
 
 @app.route('/')
 def index():
     logged_in = 'username' in session
     return render_template('index.html', logged_in=logged_in, current_user=session.get('username'))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -186,10 +192,11 @@ def tasks():
         elif request.form.get('click') == 'Retake':
             global retake
             retake = 1
-            return render_template('take_photo.html', show_modal=False)        
+            return render_template('take_photo.html', show_modal=False)
         else:
             return "fail"
     return render_template('take_photo.html', show_modal=False)
+
 
 @app.route('/upload_photo')
 def upload_photo():
