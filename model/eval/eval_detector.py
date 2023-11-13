@@ -2,7 +2,7 @@ import os
 import numpy as np
 from glob import glob
 from tensorflow.keras.applications.resnet50 import preprocess_input
-from .test_helper import load_dataset
+from .eval_helper import load_dataset
 from ..globals import (
     faces_data_dir,
     train_set_dir,

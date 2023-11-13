@@ -3,7 +3,7 @@ import sys
 from ..model import (
     Model,
 )
-from .test_helper import (
+from .eval_helper import (
     load_dataset,
     load_bottleneck_features,
 )
