@@ -5,5 +5,14 @@
         <input type="file" name="file">
         <input type="submit" value="Upload">
     </form>
+    {% if upload_error %}
+        <p style="color: red; text-align: center;">Upload Failed. Please try again.</p>
+    {% endif %}
+    {% if upload%}
+        <p style="color: rgb(0, 255, 76); text-align: center;">Upload Succeeded!</p>
+        {% if breed != None%}
+        <p style="color: rgb(0, 0, 0); text-align: center;">It seems like you uploaded a {{breed}}</p>
+        {% endif %}
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,6 +1,7 @@
 import cv2
 import datetime as dt
-from flask import Flask, render_template, Response, request, redirect, session
+import psycopg2
+from flask import Flask, render_template, Response, request, redirect, session, flash
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import os
@@ -14,9 +15,11 @@ from model.globals import (
     default_saved_model_name
 )
 
-# bottler = load_bottling_model()
-# detector = load_detector_model()
-# model = load_model(bottler, default_saved_model_name)
+
+bottler = load_bottling_model()
+detector = load_detector_model()
+model = load_model(bottler, default_saved_model_name)
+
 
 global capture
 global save
@@ -39,38 +42,36 @@ except OSError as error:
 
 app = Flask(__name__, static_url_path='/static')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test2.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:password@localhost:5431/furtographer'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Add a secret key for session management
 app.config['SECRET_KEY'] = 'your_secret_key'
 db = SQLAlchemy(app)
 
 
 class Collection(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'collections'
+    id = db.Column(db.BigInteger, primary_key=True)
     content = db.Column(db.String(200), nullable=False)
     breed = db.Column(db.String(200), nullable=False)
     completed = db.Column(db.Integer, default=0)
     date_created = db.Column(db.DateTime, default=dt.datetime.utcnow)
 
     def __repr__(self):
-        return '<Task %r>' % self.id
+        return '<Collection %r>' % self.id
 
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(200), nullable=False)
-    password = db.Column(db.String(200), nullable=False)
+    __tablename__ = 'users'
+    id = db.Column(db.BigInteger, primary_key=True)
+    username = db.Column(db.String(200), nullable=False, unique=True, name='user_name')
+    password = db.Column(db.String(200), nullable=False, name='pwd')
 
     def __repr__(self):
         return '<User %r>' % self.id
-
+    
     def check_password(self, password):
         return self.password == password
-
-
-# Create the database tables within the application context
-with app.app_context():
-    db.create_all()
 
 
 def generate_frames():
@@ -145,7 +146,6 @@ def register():
         new_username = request.form['username']
         new_password = request.form['password']
         new_confirm_password = request.form['confirm_password']
-        new_user = User(username=new_username, password=new_password)
 
         # Check if the username is already taken
         existing_user = User.query.filter_by(username=new_username).first()
@@ -172,6 +172,7 @@ def register():
             return 'There was an issue with registration. Please try again.'
 
     return render_template('register.html')
+
 
 
 @app.route('/video')
@@ -214,14 +215,19 @@ def upload_photo():
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
     if 'file' not in request.files:
-        return 'No file part'
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=True, breed=None)
     file = request.files['file']
     if file.filename == '':
-        return 'No selected file'
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=True, breed=None)
+    
     if file:
         # for now, the file is just going to this directory, but we will need to connect this to our db/image storage system
         file.save("uploads/" + file.filename)
-        return 'File uploaded successfully'
+
+        ### Classifying the File
+        breed = detect_and_predict_breed_from_path(f"uploads/{file.filename}", detector_model=detector, bottling_model=bottler, model=model)
+        breedname = str(breed).replace('_', ' ')
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname)
 
 
 @app.route('/collection', methods=['POST', 'GET'])
@@ -234,9 +240,11 @@ def collection():
         try:
             db.session.add(new_furto)
             db.session.commit()
-            return redirect('/collection', logged_in=logged_in, current_user=session.get('username'))
-        except:
+            return redirect('/collection')
+        except Exception as e:
+            print(f"Error: {e}")
             return 'There was an issue adding your furto! Sorry!'
+
     else:
         tasks = Collection.query.order_by(Collection.date_created).all()
         return render_template('collection.html', title='View Collection', tasks=tasks, logged_in=logged_in, current_user=session.get('username'))
