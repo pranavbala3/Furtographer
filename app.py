@@ -16,6 +16,11 @@ from model.globals import (
 )
 
 
+bottler = load_bottling_model()
+detector = load_detector_model()
+model = load_model(bottler, default_saved_model_name)
+
+
 global capture
 global save
 global retake
@@ -202,14 +207,19 @@ def upload_photo():
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
     if 'file' not in request.files:
-        return 'No file part'
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=True, breed=None)
     file = request.files['file']
     if file.filename == '':
-        return 'No selected file'
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=True, breed=None)
+    
     if file:
         # for now, the file is just going to this directory, but we will need to connect this to our db/image storage system
         file.save("uploads/" + file.filename)
-        return 'File uploaded successfully'
+
+        ### Classifying the File
+        breed = detect_and_predict_breed_from_path(f"uploads/{file.filename}", detector_model=detector, bottling_model=bottler, model=model)
+        breedname = str(breed).replace('_', ' ')
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname)
 
 
 @app.route('/collection', methods=['POST', 'GET'])
