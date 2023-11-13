@@ -206,15 +206,19 @@ def upload_photo():
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
     if 'file' not in request.files:
-        return render_template('upload_photo.html', title='Upload Photo', upload_error=True)
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=True, breed=None)
     file = request.files['file']
     if file.filename == '':
-        return render_template('upload_photo.html', title='Upload Photo', upload_error=True)
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=True, breed=None)
     
     if file:
         # for now, the file is just going to this directory, but we will need to connect this to our db/image storage system
         file.save("uploads/" + file.filename)
-        return render_template('upload_photo.html', title='Upload Photo', upload=True)
+
+        ### Classifying the File
+        breed = detect_and_predict_breed_from_path(f"uploads/{file.filename}", detector_model=detector, bottling_model=bottler, model=model)
+        breedname = str(breed).replace('_', ' ')
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname)
 
 
 @app.route('/collection', methods=['POST', 'GET'])
