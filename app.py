@@ -37,7 +37,7 @@ try:
 except OSError as error:
     pass
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test2.db'
 # Add a secret key for session management
@@ -124,7 +124,6 @@ def login():
         username = request.form['username']
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
-
         # Assuming you have a check_password method in your User model
         if user and user.check_password(password):
             session['username'] = user.username

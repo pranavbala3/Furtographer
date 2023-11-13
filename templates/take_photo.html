@@ -47,7 +47,6 @@
             closeModal();
         });
 
-        // Add this function to close the modal
         function closeModal() {
             var modal = document.getElementById('myModal');
             modal.style.display = 'none';
@@ -70,7 +69,7 @@
             // Update the captured image in the modal
             const capturedImage = document.getElementById('capturedImage');
             capturedImage.src = '{{ url_for("captured_frame") }}';
-            capturedImage.style.display = 'block'; // Make sure the image is visible
+            capturedImage.style.display = 'block';
         }
 
         {% if show_modal %}
