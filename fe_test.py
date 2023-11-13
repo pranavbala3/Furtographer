@@ -16,7 +16,7 @@ def test_home_page():
 def client():
     app.config['TESTING'] = True
     # Use a test database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test_db.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:password@localhost:5431/furtographer'
     client = app.test_client()
     with app.app_context():
         db.create_all()

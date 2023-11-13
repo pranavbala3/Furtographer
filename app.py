@@ -1,7 +1,7 @@
 import cv2
 import datetime as dt
 import psycopg2
-from flask import Flask, render_template, Response, request, redirect, session, flash
+from flask import Flask, render_template, Response, request, redirect, session, flash, url_for
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import os
@@ -212,12 +212,13 @@ def upload():
 
     if file:
         # for now, the file is just going to this directory, but we will need to connect this to our db/image storage system
-        file.save("uploads/" + file.filename)
+        file.save("./static/uploads/" + file.filename)
 
         ### Classifying the File
-        breed = model.predict_path(f"uploads/{file.filename}")
+        breed = model.predict_path(f"static/uploads/{file.filename}")
         breedname = str(breed).replace('_', ' ')
-        return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname)
+        return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname, \
+            uploaded_image_url=url_for('static', filename=f'uploads/{file.filename}'))
 
 
 @app.route('/collection', methods=['POST', 'GET'])

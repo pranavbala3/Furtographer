@@ -12,6 +12,9 @@
         <p style="color: rgb(0, 255, 76); text-align: center;">Upload Succeeded!</p>
         {% if breed != None%}
         <p style="color: rgb(0, 0, 0); text-align: center;">It seems like you uploaded a {{breed}}</p>
+        <div style="margin: auto; display: inline-block;">
+            <img src="{{ uploaded_image_url }}" alt="uploaded image">
+        </div>
         {% endif %}
     {% endif %}
 </div>
