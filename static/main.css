@@ -13,6 +13,20 @@ html {
     background-color: rgb(255, 255, 255);
 }
 
+#navbar img {
+    margin-top: -15px; /* Adjust the value as needed */
+}
+
+.navbar {
+    height: 52px;
+}
+
+.navbar-brand img {
+    max-width: 100%;
+    height: auto;
+    display: inline-block;
+}
+
 .content {
     margin: 0 auto;
     width: 600px;
