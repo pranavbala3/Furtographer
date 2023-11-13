@@ -4,15 +4,26 @@ from flask import Flask, render_template, Response, request, redirect, session
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import os
+from model.model import (
+    detect_and_predict_breed_from_path,
+    load_model,
+    load_detector_model,
+    load_bottling_model,
+)
+from model.globals import (
+    default_saved_model_name
+)
+
+# bottler = load_bottling_model()
+# detector = load_detector_model()
+# model = load_model(bottler, default_saved_model_name)
 
 global capture
 global save
 global retake
-global latest_frame
 capture = 0
 save = 0
 retake = 0
-latest_frame = None
 
 try:
     os.mkdir('./photos')
@@ -42,6 +53,7 @@ class Collection(db.Model):
     def __repr__(self):
         return '<Task %r>' % self.id
 
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(200), nullable=False)
@@ -58,48 +70,44 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
+
 def generate_frames():
     global capture
     global save
     global retake
-    global latest_frame
     camera = cv2.VideoCapture(0)
     while True:
         success, frame = camera.read()
-        
         if not success:
             break
         else:
-            ret, buffer = cv2.imencode('.jpg', cv2.flip(frame,1))
+            ret, buffer = cv2.imencode('.jpg', cv2.flip(frame, 1))
             frame_buffer = buffer.tobytes()
             if not ret:
                 continue
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n')
-        if capture:
-            latest_frame = buffer
-            capture=0
-            while not save and not retake:
+        if (capture):
+            capture = 0
+            while (not save and not retake):
                 pass
-            if save:
+            if (save):
                 frame_np = np.asarray(frame)
                 now = dt.datetime.now()
-                p = os.path.sep.join(['photos', "photo_{}.jpg".format(str(now).replace(":",''))])
+                p = os.path.sep.join(
+                    ['photos', "photo_{}.jpg".format(str(now).replace(":", ''))])
                 cv2.imwrite(p, frame_np)
                 save = 0
-            elif retake:
+            elif (retake):
                 retake = 0
     camera.release()
 
-@app.route('/captured_frame')
-def captured_frame():
-    global latest_frame
-    return latest_frame
 
 @app.route('/')
 def index():
     logged_in = 'username' in session
     return render_template('index.html', logged_in=logged_in, current_user=session.get('username'))
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -184,10 +192,11 @@ def tasks():
         elif request.form.get('click') == 'Retake':
             global retake
             retake = 1
-            return render_template('take_photo.html', show_modal=False)        
+            return render_template('take_photo.html', show_modal=False)
         else:
             return "fail"
     return render_template('take_photo.html', show_modal=False)
+
 
 @app.route('/upload_photo')
 def upload_photo():
@@ -209,6 +218,7 @@ def upload():
 
 @app.route('/collection', methods=['POST', 'GET'])
 def collection():
+    logged_in = 'username' in session
     if request.method == 'POST':
         task_content = request.form['content']
         task_breed = request.form['breed']
@@ -216,12 +226,12 @@ def collection():
         try:
             db.session.add(new_furto)
             db.session.commit()
-            return redirect('/collection')
+            return redirect('/collection', logged_in=logged_in, current_user=session.get('username'))
         except:
             return 'There was an issue adding your furto! Sorry!'
     else:
         tasks = Collection.query.order_by(Collection.date_created).all()
-        return render_template('collection.html', title='View Collection', tasks=tasks)
+        return render_template('collection.html', title='View Collection', tasks=tasks, logged_in=logged_in, current_user=session.get('username'))
 
 
 @app.route('/delete/<int:id>')

@@ -1,6 +1,15 @@
 # Furtographer
 CSDS 393: Software Engineering Project
 
+## Setup Locally
+
+```
+git clone https://github.com/pranavbala3/Furtographer.git
+python3 -m venv venv
+# activate venv
+pip install -r requirements.txt
+```
+
 ## Setup
 To install Flask
 ```
@@ -49,6 +58,16 @@ docker-compose --file docker-compose.yml down
     ```
     docker-compose run --rm furto_flyway migrate
     ```
-1. Or, execute sql script(s) from a database management tool. 
+1. Or, execute sql script(s) from a database management tool.
 
+## For Training and Predicting
 
+1. Download datasets:
+
+    `make setup_training`
+
+    Look at `train.ipynb` for example training.
+
+2. Begin predicting with:
+
+   `make predict IMG=*path*`
