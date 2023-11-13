@@ -3,8 +3,16 @@
 <div>
     <form method="POST" enctype="multipart/form-data" action="/upload">
         <input type="file" name="file">
-        <input type="submit" value="Upload">
+        <input type="submit" value="Upload" onclick="openPopup()">
     </form>
+
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <p>Processing your furto!</p>
+        </div>
+    </div>
+
     {% if upload_error %}
         <p style="color: red; text-align: center;">Upload Failed. Please try again.</p>
     {% endif %}
@@ -12,10 +20,29 @@
         <p style="color: rgb(0, 255, 76); text-align: center;">Upload Succeeded!</p>
         {% if breed != None%}
         <p style="color: rgb(0, 0, 0); text-align: center;">It seems like you uploaded a {{breed}}</p>
-        <div style="margin: auto; display: inline-block;">
-            <img src="{{ uploaded_image_url }}" alt="uploaded image">
+        <div style="margin: auto; display: inline-block; text-align: left">
+            <img src="{{ uploaded_image_url }}" style="max-width: 800px; max-height: 500px;" alt="uploaded image">
         </div>
         {% endif %}
     {% endif %}
 </div>
+<script>
+    // Open the popup
+    function openPopup() {
+        document.getElementById("popup").style.display = "block";
+    }
+
+    // Close the popup
+    function closePopup() {
+        document.getElementById("popup").style.display = "none";
+    }
+
+    // Close the popup if the user clicks outside of it
+    window.onclick = function(event) {
+        var popup = document.getElementById("popup");
+        if (event.target == popup) {
+            popup.style.display = "none";
+        }
+    };
+</script>
 {% endblock %}
