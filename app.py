@@ -21,9 +21,11 @@ from model.globals import (
 global capture
 global save
 global retake
+global latest_frame
 capture = 0
 save = 0
 retake = 0
+latest_frame = None
 
 try:
     os.mkdir('./photos')
@@ -75,6 +77,8 @@ def generate_frames():
     global capture
     global save
     global retake
+    global latest_frame
+
     camera = cv2.VideoCapture(0)
     while True:
         success, frame = camera.read()
@@ -88,6 +92,7 @@ def generate_frames():
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n')
         if (capture):
+            latest_frame = buffer
             capture = 0
             while (not save and not retake):
                 pass
@@ -102,6 +107,10 @@ def generate_frames():
                 retake = 0
     camera.release()
 
+@app.route('/captured_frame')
+def captured_frame():
+    global latest_frame
+    return latest_frame
 
 @app.route('/')
 def index():
