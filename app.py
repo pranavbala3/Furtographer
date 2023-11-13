@@ -5,7 +5,6 @@ from flask import Flask, render_template, Response, request, redirect, session, 
 from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import os
-<<<<<<< Updated upstream
 from model.model import (
     detect_and_predict_breed_from_path,
     load_model,
@@ -15,8 +14,6 @@ from model.model import (
 from model.globals import (
     default_saved_model_name
 )
-=======
->>>>>>> Stashed changes
 
 
 global capture
@@ -55,10 +52,7 @@ class Collection(db.Model):
 
     def __repr__(self):
         return '<Collection %r>' % self.id
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
 
 class User(db.Model):
     __tablename__ = 'users'
