@@ -32,14 +32,7 @@
             modal.style.display = 'block';
 
             document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            var modal = document.getElementById('myModal');
-            modal.style.display = 'none';
-            // Revert scrolling to normal when the modal is closed
-            document.body.style.overflow = 'auto';
-        }        
+        }   
 
         // click event handlers for the save and retake buttons
         document.getElementById('saveBtn').addEventListener('click', function() {
@@ -53,7 +46,6 @@
             alert('Retake!');
             closeModal();
         });
-<<<<<<< Updated upstream
 
         // Add this function to close the modal
         function closeModal() {
@@ -62,8 +54,6 @@
 
             document.body.style.overflow = 'auto';
         }
-=======
->>>>>>> Stashed changes
         
         function showBlur() {
             document.getElementById('overlay').style.display = 'block';

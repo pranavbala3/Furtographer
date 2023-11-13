@@ -63,9 +63,8 @@ def generate_frames():
     global save
     global retake
     global latest_frame
-
+    camera = cv2.VideoCapture(0)
     while True:
-        camera = cv2.VideoCapture(0)
         success, frame = camera.read()
         
         if not success:
