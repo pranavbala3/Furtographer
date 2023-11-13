@@ -10,7 +10,7 @@ from ..globals import (
 )
 from ..model import (
     path_to_tensor,
-    load_detector_model,
+    Model,
 )
 
 
@@ -21,7 +21,7 @@ def is_dog(detector_model, img_path):
 
 
 if __name__ == "__main__":
-    model = load_detector_model()
+    model = Model()
 
     dogs_in_human_files_short = []
     dogs_in_dog_files_short = []
@@ -35,10 +35,12 @@ if __name__ == "__main__":
     dogs_in_human_files = []
     dogs_in_dog_files = []
     for human in human_files:
-        dog_in_human = is_dog(model, human)
+        img = path_to_tensor(human)
+        dog_in_human = model.is_dog(img)
         dogs_in_human_files.append(dog_in_human)
     for dog in train_files:
-        dog_in_dog = is_dog(model, dog)
+        img = path_to_tensor(dog)
+        dog_in_dog = model.is_dog(img)
         dogs_in_dog_files.append(dog_in_dog)
 
     print('Proportion of dogs detected in human files: ',

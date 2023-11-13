@@ -1,8 +1,7 @@
 import numpy as np
 import sys
 from ..model import (
-    load_model,
-    load_bottling_model,
+    Model,
 )
 from .test_helper import (
     load_dataset,
@@ -28,9 +27,8 @@ def print_accuracy(model, features, targets, name):
 
 
 if __name__ == "__main__":
-    bottler = load_bottling_model()
+    model = Model(default_saved_model_name)
     saved_path = sys.argv[1] if len(sys.argv) > 1 else default_saved_model_name
-    model = load_model(bottler, saved_path)
 
     train_files, train_targets = load_dataset(train_set_dir)
     valid_files, valid_targets = load_dataset(valid_set_dir)
@@ -40,4 +38,4 @@ if __name__ == "__main__":
 
     # print_accuracy(model, train_features, train_targets, "Train")
     # print_accuracy(model, valid_features, valid_targets, "Valid")
-    print_accuracy(model, test_features, test_targets, "Test")
+    print_accuracy(model.classifier, test_features, test_targets, "Test")

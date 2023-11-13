@@ -6,20 +6,10 @@ from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import os
 from model.model import (
-    detect_and_predict_breed_from_path,
-    load_model,
-    load_detector_model,
-    load_bottling_model,
-)
-from model.globals import (
-    default_saved_model_name
+    Model,
 )
 
-
-bottler = load_bottling_model()
-detector = load_detector_model()
-model = load_model(bottler, default_saved_model_name)
-
+model = Model()
 
 global capture
 global save
@@ -69,7 +59,7 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.id
-    
+
     def check_password(self, password):
         return self.password == password
 
@@ -219,13 +209,13 @@ def upload():
     file = request.files['file']
     if file.filename == '':
         return render_template('upload_photo.html', title='Upload Photo', upload_error=True, breed=None)
-    
+
     if file:
         # for now, the file is just going to this directory, but we will need to connect this to our db/image storage system
         file.save("uploads/" + file.filename)
 
         ### Classifying the File
-        breed = detect_and_predict_breed_from_path(f"uploads/{file.filename}", detector_model=detector, bottling_model=bottler, model=model)
+        breed = model.predict_path(f"uploads/{file.filename}")
         breedname = str(breed).replace('_', ' ')
         return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname)
 
