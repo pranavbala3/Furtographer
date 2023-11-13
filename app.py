@@ -89,10 +89,10 @@ def generate_frames():
             frame_buffer = buffer.tobytes()
             if not ret:
                 continue
+            latest_frame = frame_buffer
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n')
         if (capture):
-            latest_frame = buffer
             capture = 0
             while (not save and not retake):
                 pass
@@ -110,7 +110,7 @@ def generate_frames():
 @app.route('/captured_frame')
 def captured_frame():
     global latest_frame
-    return latest_frame
+    return Response(latest_frame, mimetype='image/jpeg')
 
 @app.route('/')
 def index():
