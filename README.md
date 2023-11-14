@@ -26,7 +26,7 @@ pip install -r requirements.txt
 ```
 
 ### Setup Database
-1. Install [Docker Desktop] (https://www.docker.com/products/docker-desktop/)
+1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 2. Install `docker` and `docker-compose`
     ```
     $ brew install docker
