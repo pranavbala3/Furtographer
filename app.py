@@ -77,7 +77,7 @@ def generate_frames():
     global latest_frame
 
     camera = cv2.VideoCapture(0)
-    while True:
+    while camera.isOpened():
         success, frame = camera.read()
         if not success:
             break
