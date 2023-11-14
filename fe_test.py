@@ -1,7 +1,7 @@
 from app import app, Collection, conn, User
 import psycopg2
 import pytest
-import re
+from flask import url_for
 
 # Initialize the app for testing
 @pytest.fixture
@@ -367,3 +367,27 @@ def test_upload_photo_page(client):
 
 
 # Sample test for 
+
+# Sample test to check the response when clicking 'Capture'
+def test_tasks_capture(client):
+    response = client.post('/tasks', data={'click': 'Capture'})
+    assert response.status_code == 200
+    assert b'Take Photo' in response.data  # Adjust this line based on your expected response
+
+# Sample test to check the response when clicking 'Save'
+def test_tasks_save(client):
+    response = client.post('/tasks', data={'click': 'Save'})
+    assert response.status_code == 200
+    # assert b'Take Photo' not in response.data # figure the best way to check assertion later
+
+# Sample test to check the response when clicking 'Retake'
+def test_tasks_retake(client):
+    response = client.post('/tasks', data={'click': 'Retake'})
+    assert response.status_code == 200
+    # assert b'Take Photo' not in response.data # figure the best way to check assertion later
+
+# Sample test to check the response when an invalid action is provided
+def test_tasks_invalid_action(client):
+    response = client.post('/tasks', data={'click': 'InvalidAction'})
+    assert response.status_code == 200
+    assert b'fail' in response.data  # Adjust this line based on your expected response
