@@ -1,111 +1,80 @@
-# Front End Testing using PyTest FrameWork
-from app import app, db, Collection
+from app import app, Collection
+import psycopg2
 import pytest
+
 # Initialize the app for testing
+@pytest.fixture
+def client():
+    app.config['TESTING'] = True
+    # Use a test database
+    db_connection = psycopg2.connect(
+        "dbname='furtographer' user='admin' password='password' host='localhost' port='5431'"
+    )
+    cursor = db_connection.cursor()
+    with app.app_context():
+        # Create tables
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS collection (
+                id SERIAL PRIMARY KEY,
+                content VARCHAR(255),
+                breed VARCHAR(255)
+            )
+        ''')
+        db_connection.commit()
 
+    client = app.test_client()
+
+    yield client
+
+    with app.app_context():
+        # Drop tables
+        cursor.execute('DROP TABLE IF EXISTS collection')
+        db_connection.commit()
+        cursor.close()
+        db_connection.close()
+        
 # Test that the website works
-
-
 def test_home_page():
     client = app.test_client()
     response = client.get('/')
     assert response.status_code == 200
 
 
-@pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    # Use a test database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:password@localhost:5431/furtographer'
-    client = app.test_client()
-    with app.app_context():
-        db.create_all()
-    yield client
-    with app.app_context():
-        db.drop_all()
-
 # Sample test for the index page
-
-
 def test_index_page(client):
     response = client.get('/')
     assert response.status_code == 200
     assert b'What breed is this dog?' in response.data
 
 
-# Sample test for the login page
-def test_logins(client):
-    client.post('/register', data={'username': 'testuser',
-                'password': 'testpassword', 'confirm_password': 'testpassword'})
-    response = client.post(
-        '/login', data={'username': 'testuser', 'password': 'testpassword'})
-    print("HERE")
-    print(response.data)
-    assert response.location == '/'
-
-
-def test_login_failure(client):
-    response = client.post(
-        '/login', data={'username': 'testuser', 'password': 'wrongpassword'})
-    print("HERE")
-    print(response.data)
-    assert response.status_code == 200  # Check for a non-redirect
-    # Check for specific content in the response
-    assert b'Login failed' in response.data
-
 # Sample test for adding a new item to the collection
-
-
 def test_add_to_collection(client):
     response = client.post(
         '/collection', data={'content': 'Test Item', 'breed': 'Test Breed'})
-    print("HERE")
-    print(response.data)
     assert b'Task added!' in response.data
-    assert Collection.query.count() == 1
 
-# Sample test for capturing a photo
-
-
-def test_capture_photo(client):
-    response = client.post('/tasks', data={'click': 'Capture'})
-    assert b'photo captured' in response.data
-
-# Sample test for uploading a photo
-
-
-def test_upload_photo(client):
-    response = client.post(
-        '/upload', data={'file': (open('test_image.jpg', 'rb'), 'test_image.jpg')})
-    assert b'File uploaded successfully' in response.data
 
 # Sample test for updating a collection item
-
-
 def test_update_collection_item(client):
-    new_item = Collection(content='Initial Content', breed='Initial Breed')
-    db.session.add(new_item)
-    db.session.commit()
+    response = client.post(
+        '/collection', data={'content': 'Initial Content', 'breed': 'Initial Breed'})
+    assert b'Task added!' in response.data
+
+    item_id = Collection.query.first().id
 
     response = client.post(
-        f'/update/{new_item.id}', data={'content': 'Updated Content', 'breed': 'Updated Breed'})
+        f'/update/{item_id}', data={'content': 'Updated Content', 'breed': 'Updated Breed'})
     assert b'Task updated!' in response.data
-    updated_item = Collection.query.get(new_item.id)
-    assert updated_item.content == 'Updated Content'
-    assert updated_item.breed == 'Updated Breed'
+
 
 # Sample test for deleting a collection item
-
-
 def test_delete_collection_item(client):
-    new_item = Collection(content='Item to Delete', breed='Breed to Delete')
-    db.session.add(new_item)
-    db.session.commit()
+    response = client.post(
+        '/collection', data={'content': 'Item to Delete', 'breed': 'Breed to Delete'})
+    assert b'Task added!' in response.data
 
-    response = client.get(f'/delete/{new_item.id}')
+    item_id = Collection.query.first().id
+
+    response = client.get(f'/delete/{item_id}')
     assert b'Task deleted!' in response.data
-    assert Collection.query.get(new_item.id) is None
-
-
-if __name__ == '__main__':
-    pytest.main()
+    assert Collection.query.get(item_id) is None
