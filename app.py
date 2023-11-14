@@ -98,7 +98,7 @@ def generate_frames():
             if save:
                 frame_np = np.asarray(frame)
                 now = dt.datetime.now()
-                p = os.path.sep.join(['photos', "photo_{}.jpg".format(str(now).replace(":", ''))])
+                p = os.path.sep.join(['static/photos', "photo_{}.jpg".format(str(now).replace(":", ''))])
                 cv2.imwrite(p, frame_np)
                 Collection.add(p, "breed_placeholder")  # Replace "breed_placeholder" with the actual breed
                 save = 0

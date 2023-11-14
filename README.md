@@ -3,6 +3,8 @@ CSDS 393: Software Engineering Project
 
 ## Setup Locally
 
+Requires Python *3.11* and the docker application.
+
 ### Clone
 ```
 git clone https://github.com/pranavbala3/Furtographer.git
