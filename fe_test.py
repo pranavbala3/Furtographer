@@ -1,4 +1,4 @@
-from app import app, Collection
+from app import app, Collection, conn
 import psycopg2
 import pytest
 
@@ -6,33 +6,12 @@ import pytest
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
-    # Use a test database
-    db_connection = psycopg2.connect(
-        "dbname='furtographer' user='admin' password='password' host='localhost' port='5431'"
-    )
-    cursor = db_connection.cursor()
-    with app.app_context():
-        # Create tables
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS collection (
-                id SERIAL PRIMARY KEY,
-                content VARCHAR(255),
-                breed VARCHAR(255)
-            )
-        ''')
-        db_connection.commit()
 
+    # Now create the test client
     client = app.test_client()
 
     yield client
 
-    with app.app_context():
-        # Drop tables
-        cursor.execute('DROP TABLE IF EXISTS collection')
-        db_connection.commit()
-        cursor.close()
-        db_connection.close()
-        
 # Test that the website works
 def test_home_page():
     client = app.test_client()
@@ -49,32 +28,93 @@ def test_index_page(client):
 
 # Sample test for adding a new item to the collection
 def test_add_to_collection(client):
-    response = client.post(
-        '/collection', data={'content': 'Test Item', 'breed': 'Test Breed'})
-    assert b'Task added!' in response.data
+
+    # delete every item in the collection table
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM collections")
+        conn.commit()
+
+    # Simulate adding an item to the collection
+    response = client.post('/collection', data=dict(content='New Furto', breed='Test Breed'), follow_redirects=True)
+
+    # Check if the response status code is 200 (OK)
+    assert response.status_code == 200
+
+    # Check if the new item is present in the collection
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM collections")
+        tasks = cursor.fetchall()
+        assert len(tasks) == 1
+        assert tasks[0][1] == 'New Furto'
+        assert tasks[0][2] == 'Test Breed'
 
 
 # Sample test for updating a collection item
 def test_update_collection_item(client):
-    response = client.post(
-        '/collection', data={'content': 'Initial Content', 'breed': 'Initial Breed'})
-    assert b'Task added!' in response.data
+    # Clear the collections table before the test
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM collections")
+        conn.commit()
 
-    item_id = Collection.query.first().id
+    # Add an item to the collection
+    response = client.post('/collection', data=dict(content='Item to Update', breed='Breed to Update'), follow_redirects=True)
+    assert response.status_code == 200
 
-    response = client.post(
-        f'/update/{item_id}', data={'content': 'Updated Content', 'breed': 'Updated Breed'})
-    assert b'Task updated!' in response.data
+    # Check if the item is present in the collection
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM collections")
+        tasks = cursor.fetchall()
+        assert len(tasks) == 1
 
+        # Get the ID of the added item
+        item_id = tasks[0][0]
+
+    # Simulate updating the item
+    response = client.post(f'/update/{item_id}', data=dict(content='Updated Item', breed='Updated Breed'), follow_redirects=True)
+    assert response.status_code == 200
+
+    # Check if the item is present in the collection and is updated
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM collections")
+        tasks = cursor.fetchall()
+        assert len(tasks) == 1
+        assert tasks[0][1] == 'Updated Item'
+        assert tasks[0][2] == 'Updated Breed'
 
 # Sample test for deleting a collection item
 def test_delete_collection_item(client):
-    response = client.post(
-        '/collection', data={'content': 'Item to Delete', 'breed': 'Breed to Delete'})
-    assert b'Task added!' in response.data
+    # Clear the collections table before the test
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM collections")
+        conn.commit()
 
-    item_id = Collection.query.first().id
+    # Add an item to the collection
+    response = client.post('/collection', data=dict(content='Item to Delete', breed='Breed to Delete'), follow_redirects=True)
+    assert response.status_code == 200
 
-    response = client.get(f'/delete/{item_id}')
-    assert b'Task deleted!' in response.data
-    assert Collection.query.get(item_id) is None
+    # Check if the item is present in the collection
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM collections")
+        tasks = cursor.fetchall()
+        assert len(tasks) == 1
+
+        # Get the ID of the added item
+        item_id = tasks[0][0]
+
+    # Simulate deleting the item
+    response = client.get(f'/delete/{item_id}', follow_redirects=True)
+    assert response.status_code == 200
+
+    # Check if the item is no longer present in the collection
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM collections")
+        tasks = cursor.fetchall()
+        assert len(tasks) == 0
