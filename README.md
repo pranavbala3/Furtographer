@@ -20,9 +20,40 @@ In *cmd.exe:* `env\Scripts\activate.bat`
 
 In *powershell:* `env\Scripts\Activate.ps1`
 
-### Insall Requirements
+### Install Requirements
 ```
 pip install -r requirements.txt
+```
+
+### Setup Database
+1. Install [Docker Desktop] (https://www.docker.com/products/docker-desktop/)
+2. Install `docker` and `docker-compose`
+    ```
+    $ brew install docker
+    $ brew install docker-compose
+    ```
+3.  Open the Docker Desktop app to start Docker Engine
+
+### Start the DB Container
+1. Change directory to `database` folder.
+2. Run the following command to start db. It will apply all SQL scripts under `sql` folder using the db migration tool "Flyway"
+If you have make:
+```
+make docker_up
+```
+otherwise
+```
+docker-compose --file docker-compose.yml up --detach
+```
+
+### Stop the DB Container
+If you have make
+```
+make docker_down
+```
+otherwise
+```
+docker-compose --file docker-compose.yml down
 ```
 
 ### To Run
@@ -45,53 +76,3 @@ python app.py
 3. Begin predicting with:
 
    `make predict IMG=*path*`
-
-## Setup
-To install Flask
-```
-pip install Flask
-```
-
-## Instructions
-To run the web app
-```
-export FLASK_APP=app
-export FLASK_ENV=development
-flask run
-```
-The application will run locally on the URL http://127.0.0.1:5000/
-
-## How to Run Database in Docker
-
-1. Install [Docker Desktop] (https://www.docker.com/products/docker-desktop/)
-1. Install `docker` and `docker-compose`
-    ```
-    $ brew install docker
-    $ brew install docker-compose
-    ```
-1.  Open the Docker Desktop app to start Docker Engine
-
-### Start the DB Container
-1. Change directory to `database` folder.
-1. Run the following command to start db. It will apply all SQL scripts under `sql` folder using the db migration tool "Flyway"
-```
-docker-compose --file docker-compose.yml up --detach
-```
-
-### Stop the DB Container
-```
-docker-compose --file docker-compose.yml down
-```
-
-### Create New SQL Scripts and Apply to DB
-1. Create a new file in the sql subfolder `sql/data` or `sql/tables`.
-1. Follow the file naming convention below for Flyway to install files.
-    ```
-    format: VYYYMMDD_HHmm__[file name].sql
-    eg: V20231026_0302__create_table_users.sql
-    ```
-1. Run the following command if the docker containers are up.
-    ```
-    docker-compose run --rm furto_flyway migrate
-    ```
-1. Or, execute sql script(s) from a database management tool.
