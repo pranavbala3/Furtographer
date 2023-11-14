@@ -253,3 +253,14 @@ def test_delete_collection_item(client):
         cursor.execute("SELECT * FROM collections")
         tasks = cursor.fetchall()
         assert len(tasks) == 0
+
+# Sample test for upload photo page
+def test_upload_photo_page(client):
+    response = client.get('/upload_photo')
+    assert response.status_code == 200
+    assert b'Upload' in response.data
+
+# Sample test for uploading a photo
+
+
+#
