@@ -23,8 +23,11 @@ class Model():
             name = default_saved_model_name
         self.classifier = load_classifier(self.bottler, name)
 
+    def form_image(self, path):
+        return preprocess_input(path_to_tensor(path))
+
     def predict_path(self, path):
-        img = preprocess_input(path_to_tensor(path))
+        img = self.form_image(path)
         if self.is_dog(img):
             breed = self.predict_breed(img).split('.')[-1]
             return breed
