@@ -170,7 +170,7 @@ def register():
             return render_template('register.html', registration_failed=True)
 
         try:
-            # Insert the new user into the database without hashing the password
+            # Insert the new user into the database 
             cursor.execute("INSERT INTO users (user_name, pwd) VALUES (%s, %s)", (new_username, new_password))
             conn.commit()
 

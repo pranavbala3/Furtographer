@@ -25,6 +25,66 @@ def test_index_page(client):
     assert response.status_code == 200
     assert b'What breed is this dog?' in response.data
 
+# Sample test for logout
+def test_logout(client):
+    # simulate logging in
+    response = client.post('/login', data=dict(username='admin', password='admin'), follow_redirects=True)
+    assert response.status_code == 200
+
+    # Go to the home page
+    response = client.get('/')
+    assert response.status_code == 200
+
+    # Simulate logging out
+    response = client.get('/logout', follow_redirects=True)
+
+    # Check if the response status code is 200 (OK)
+    assert response.status_code == 200
+
+    # Check if the user is redirected to the home page
+    assert b'What breed is this dog?' in response.data
+
+# Sample test for login
+def test_login(client):
+    # Simulate logging in
+    response = client.post('/login', data=dict(username='admin', password='admin'), follow_redirects=True)
+
+    # Check if the response status code is 200 (OK)
+    assert response.status_code == 200
+
+   # Check if the user is redirected to the home page
+    assert b'Welcome, admin!' in response.data  
+
+# Sample test for the going to register page
+def test_register_page(client):
+    response = client.get('/register')
+    assert response.status_code == 200
+    assert b'Please fill out this form to register' in response.data
+
+# Sample test for registering a new user in the database
+def test_register(client):
+    # Clear the users table before the test
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM users")
+        conn.commit()
+
+    # Simulate registering a new user
+    response = client.post('/register', data=dict(username='test', password='test', confirm_password='test'), follow_redirects=True)
+
+    # Check if the response status code is 200 (OK)
+    assert response.status_code == 200
+
+    # Check if the user is redirected to the home page
+    assert b'What breed is this dog?' in response.data
+
+    # Check if the user is present in the database
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users")
+        users = cursor.fetchall()
+        assert len(users) == 1
+        assert users[0][1] == 'test'
 
 # Sample test for adding a new item to the collection
 def test_add_to_collection(client):
