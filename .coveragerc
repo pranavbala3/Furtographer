@@ -1,6 +1,7 @@
 [run]
 omit =
-    */site-packages/*
+    */site-packages/*,
+    /private/*
 
 [report]
 show_missing=true
