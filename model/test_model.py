@@ -16,11 +16,7 @@ def images_path():
 
 
 # ensure the model ingests images of all sizes
-<<<<<<< HEAD
-def test_ingesting_different_sizes():
-=======
 def test_ingesting_different_sizes(model, images_path):
->>>>>>> 0c5bde0 (fix model tests)
     for filename in os.listdir(images_path):
         if filename != '.DS_Store':
             path = os.path.join(images_path, filename)
