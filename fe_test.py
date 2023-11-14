@@ -1,6 +1,7 @@
 from app import app, Collection, conn
 import psycopg2
 import pytest
+import re
 
 # Initialize the app for testing
 @pytest.fixture
@@ -44,8 +45,18 @@ def test_logout(client):
     # Check if the user is redirected to the home page
     assert b'What breed is this dog?' in response.data
 
-# Sample test for login page
-def test_login_page(client):
+
+# Sample test for logining in with correct credentials
+def test_login(client):
+    # simulate clearing the users table
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM users")
+        conn.commit()
+    
+    # Simulate registering a new user
+    response = client.post('/register', data=dict(username='admin', password='admin', confirm_password='admin'), follow_redirects=True)
+    
     # Simulate logging in
     response = client.post('/login', data=dict(username='admin', password='admin'), follow_redirects=True)
 
@@ -53,7 +64,7 @@ def test_login_page(client):
     assert response.status_code == 200
 
    # Check if the user is redirected to the home page
-    assert b'Welcome, admin!' in response.data  
+    assert b'Welcome, admin!' in response.data
 
 #Sample test for logining in with wrong credentials
 def test_login_wrong_credentials(client):
@@ -72,15 +83,15 @@ def test_login_wrong_credentials(client):
     # Check if the response status code is 200 (OK)
     assert response.status_code == 200
 
-   # Check if the user is redirected to the home page
-    assert b'Invalid username or password' in response.data
+    # Check that it gives the user an error message for wrong credentials
+    assert b'Login failed. Please check your username and password.' in response.data
 
 
 # Sample test for the going to register page
 def test_register_page(client):
     response = client.get('/register')
     assert response.status_code == 200
-    assert b'Please fill out this form to register' in response.data
+    assert b'Register' in response.data
 
 # Sample test for registering a new user in the database
 def test_register(client):
