@@ -117,6 +117,49 @@ def test_register(client):
         users = cursor.fetchall()
         assert len(users) == 1
         assert users[0][1] == 'test'
+    
+
+# Sample test for registering a new user with an existing username
+def test_register_existing_username(client):
+    # Clear the users table before the test
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM users")
+        conn.commit()
+
+    # Simulate registering a new user
+    response = client.post('/register', data=dict(username='test', password='test', confirm_password='test'), follow_redirects=True)
+
+    # Check if the response status code is 200 (OK)
+    assert response.status_code == 200
+
+    # Check if the user is redirected to the home page
+    assert b'What breed is this dog?' in response.data
+
+    # Check if the user is present in the database
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users")
+        users = cursor.fetchall()
+        assert len(users) == 1
+        assert users[0][1] == 'test'
+
+    # Simulate registering a new user with the same username
+    response = client.post('/register', data=dict(username='test', password='test', confirm_password='test'), follow_redirects=True)
+
+    # Check if the response status code is 200 (OK)
+    assert response.status_code == 200
+
+    # Check that it gives the user an error message for existing username
+    assert b'Registration failed. Please try again.' in response.data
+
+    # Check if the user is still present in the database
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users")
+        users = cursor.fetchall()
+        assert len(users) == 1
+        assert users[0][1] == 'test'
 
 # Sample test for adding a new item to the collection
 def test_add_to_collection(client):
