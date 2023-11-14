@@ -1,7 +1,10 @@
 import cv2
 import datetime as dt
 import psycopg2
-from flask import Flask, render_template, Response, request, redirect, session, flash, url_for
+from flask import (
+    Flask, render_template, Response,
+    request, redirect, session
+    )
 import numpy as np
 import os
 from model.model import (
@@ -19,13 +22,17 @@ save = 0
 retake = 0
 latest_frame = None
 
+static_dir = 'static'
+photos_dir = os.path.join(static_dir, 'photos')
+uploads_dir = os.path.join(static_dir, 'uploads')
+
 try:
-    os.mkdir('./photos')
+    os.mkdir(photos_dir)
 except OSError as error:
     pass
 
 try:
-    os.mkdir('./uploads')
+    os.mkdir(uploads_dir)
 except OSError as error:
     pass
 
@@ -38,7 +45,7 @@ conn = psycopg2.connect(
     port='5431'
 )
 
-app = Flask(__name__, static_url_path='/static')
+app = Flask(__name__, static_url_path='/' + static_dir)
 app.config['SECRET_KEY'] = 'your_secret_key'
 
 
@@ -98,7 +105,7 @@ def generate_frames():
             if save:
                 frame_np = np.asarray(frame)
                 now = dt.datetime.now()
-                p = os.path.sep.join(['static/photos', "photo_{}.jpg".format(str(now).replace(":", ''))])
+                p = os.path.sep.join([photos_dir, "photo_{}.jpg".format(str(now).replace(":", ''))])
                 cv2.imwrite(p, frame_np)
                 Collection.add(p, "breed_placeholder")  # Replace "breed_placeholder" with the actual breed
                 save = 0
@@ -170,7 +177,7 @@ def register():
             return render_template('register.html', registration_failed=True)
 
         try:
-            # Insert the new user into the database 
+            # Insert the new user into the database
             cursor.execute("INSERT INTO users (user_name, pwd) VALUES (%s, %s)", (new_username, new_password))
             conn.commit()
 
@@ -235,13 +242,14 @@ def upload():
 
     if file:
         # for now, the file is just going to this directory, but we will need to connect this to our db/image storage system
-        file.save("./static/uploads/" + file.filename)
+        file_path = os.path.join(uploads_dir,file.filename);
+        file.save(file_path)
 
         ### Classifying the File
-        breed = model.predict_path(f"static/uploads/{file.filename}")
+        breed = model.predict_path(file_path)
         breedname = str(breed).replace('_', ' ')
         return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname, \
-            uploaded_image_url=url_for('static', filename=f'uploads/{file.filename}'))
+            uploaded_image_url=file_path)
 
 
 @app.route('/collection', methods=['POST', 'GET'])
