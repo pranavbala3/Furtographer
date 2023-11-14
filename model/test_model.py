@@ -7,7 +7,7 @@ images_path = os.path.join(current_dir, 'images')
 
 
 # ensure the model ingests images of all sizes
-def ingesting_different_sizes():
+def test_ingesting_different_sizes():
     for filename in os.listdir(images_path):
         if filename != '.DS_Store':
             full_path = os.path.join(images_path, filename)
@@ -15,6 +15,3 @@ def ingesting_different_sizes():
             img = model.form_image(full_path)
             model.is_dog(img)
             model.predict_breed(img)
-
-
-ingesting_different_sizes()
