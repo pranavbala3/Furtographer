@@ -2,7 +2,6 @@ import cv2
 import datetime as dt
 import psycopg2
 from flask import Flask, render_template, Response, request, redirect, session, flash, url_for
-from flask_sqlalchemy import SQLAlchemy
 import numpy as np
 import os
 from model.model import (
@@ -30,38 +29,45 @@ try:
 except OSError as error:
     pass
 
+# Initialize psycopg2 connection
+conn = psycopg2.connect(
+    dbname='furtographer',
+    user='admin',
+    password='password',
+    host='localhost',
+    port='5431'
+)
+
 app = Flask(__name__, static_url_path='/static')
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://admin:password@localhost:5431/furtographer'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# Add a secret key for session management
 app.config['SECRET_KEY'] = 'your_secret_key'
-db = SQLAlchemy(app)
 
 
-class Collection(db.Model):
-    __tablename__ = 'collections'
-    id = db.Column(db.BigInteger, primary_key=True)
-    content = db.Column(db.String(200), nullable=False)
-    breed = db.Column(db.String(200), nullable=False)
-    completed = db.Column(db.Integer, default=0)
-    date_created = db.Column(db.DateTime, default=dt.datetime.utcnow)
+class Collection:
+    @staticmethod
+    def add(content, breed):
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO collections (content, breed) VALUES (%s, %s)", (content, breed))
+        conn.commit()
 
-    def __repr__(self):
-        return '<Collection %r>' % self.id
+    @staticmethod
+    def get_all():
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM collections ORDER BY date_created")
+        return cursor.fetchall()
+
+    @staticmethod
+    def delete(id):
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM collections WHERE id = %s", (id,))
+        conn.commit()
 
 
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.BigInteger, primary_key=True)
-    username = db.Column(db.String(200), nullable=False, unique=True, name='user_name')
-    password = db.Column(db.String(200), nullable=False, name='pwd')
-
-    def __repr__(self):
-        return '<User %r>' % self.id
-
-    def check_password(self, password):
-        return self.password == password
+class User:
+    @staticmethod
+    def check_password(username, password):
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE user_name = %s AND pwd = %s", (username, password))
+        return cursor.fetchone() is not None
 
 
 def generate_frames():
@@ -71,7 +77,7 @@ def generate_frames():
     global latest_frame
 
     camera = cv2.VideoCapture(0)
-    while True:
+    while camera.isOpened():
         success, frame = camera.read()
         if not success:
             break
@@ -81,20 +87,22 @@ def generate_frames():
             if not ret:
                 continue
             latest_frame = frame_buffer
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n')
-        if (capture):
+            yield (
+                b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n'
+            )
+        if capture:
             capture = 0
-            while (not save and not retake):
+            while not save and not retake:
                 pass
-            if (save):
+            if save:
                 frame_np = np.asarray(frame)
                 now = dt.datetime.now()
-                p = os.path.sep.join(
-                    ['photos', "photo_{}.jpg".format(str(now).replace(":", ''))])
+                p = os.path.sep.join(['photos', "photo_{}.jpg".format(str(now).replace(":", ''))])
                 cv2.imwrite(p, frame_np)
+                Collection.add(p, "breed_placeholder")  # Replace "breed_placeholder" with the actual breed
                 save = 0
-            elif (retake):
+            elif retake:
                 retake = 0
     camera.release()
 
@@ -114,13 +122,23 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user = User.query.filter_by(username=username).first()
-        # Assuming you have a check_password method in your User model
-        if user and user.check_password(password):
-            session['username'] = user.username
-            return redirect('/')
-        else:
-            return render_template('login.html', login_failed=True)
+
+        try:
+            # Retrieve the user with the specified username and password from the database
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE user_name = %s AND pwd = %s", (username, password))
+            user = cursor.fetchone()
+            cursor.close()
+
+            if user:
+                session['username'] = user[1]
+                return redirect('/')
+            else:
+                return render_template('login.html', login_failed=True)
+        except Exception as e:
+            print(f"Error: {e}")
+            return 'There was an issue with login. Please try again.'
+
     return render_template('login.html')
 
 
@@ -138,26 +156,31 @@ def register():
         new_confirm_password = request.form['confirm_password']
 
         # Check if the username is already taken
-        existing_user = User.query.filter_by(username=new_username).first()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE user_name = %s", (new_username,))
+        existing_user = cursor.fetchone()
+
         if existing_user:
+            cursor.close()
             return render_template('register.html', registration_failed=True)
 
         # Check if the password and confirm_password match
         if new_password != new_confirm_password:
+            cursor.close()
             return render_template('register.html', registration_failed=True)
 
-        # Create a new user
-        new_user = User(username=new_username, password=new_password)
-
         try:
-            # Add the new user to the database
-            db.session.add(new_user)
-            db.session.commit()
+            # Insert the new user into the database without hashing the password
+            cursor.execute("INSERT INTO users (user_name, pwd) VALUES (%s, %s)", (new_username, new_password))
+            conn.commit()
+
             session['username'] = new_username
 
             # Redirect to the main page after registration
+            cursor.close()
             return redirect('/')
         except Exception as e:
+            cursor.close()
             print(str(e))
             return 'There was an issue with registration. Please try again.'
 
@@ -227,47 +250,63 @@ def collection():
     if request.method == 'POST':
         task_content = request.form['content']
         task_breed = request.form['breed']
-        new_furto = Collection(content=task_content, breed=task_breed)
         try:
-            db.session.add(new_furto)
-            db.session.commit()
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO collections (content, breed) VALUES (%s, %s)", (task_content, task_breed))
+            conn.commit()
             return redirect('/collection')
         except Exception as e:
             print(f"Error: {e}")
             return 'There was an issue adding your furto! Sorry!'
-
+        finally:
+            cursor.close()
     else:
-        tasks = Collection.query.order_by(Collection.date_created).all()
-        return render_template('collection.html', title='View Collection', tasks=tasks, logged_in=logged_in, current_user=session.get('username'))
-
+        try:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM collections ORDER BY date_created")
+            tasks = cursor.fetchall()
+            # Assuming the tuple structure is (id, content, breed, completed, date_created)
+            tasks_with_headers = [{'id': row[0], 'content': row[1], 'breed': row[2], 'completed': row[3], 'date_created': row[4]} for row in tasks]
+            return render_template('collection.html', title='View Collection', tasks=tasks_with_headers, logged_in=logged_in, current_user=session.get('username'))
+        except Exception as e:
+            print(f"Error: {e}")
+            return 'There was an issue fetching furto data! Sorry!'
+        finally:
+            cursor.close()
 
 @app.route('/delete/<int:id>')
 def delete(id):
-    furto_to_delete = Collection.query.get_or_404(id)
-
     try:
-        db.session.delete(furto_to_delete)
-        db.session.commit()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM collections WHERE id = %s", (id,))
+        conn.commit()
         return redirect('/collection')
-    except:
+    except Exception as e:
+        print(f"Error: {e}")
         return 'There was a problem deleting that task'
-
+    finally:
+        cursor.close()
 
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
-    furto = Collection.query.get_or_404(id)
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM collections WHERE id = %s", (id,))
+        furto = cursor.fetchone()
 
-    if request.method == 'POST':
-        furto.content = request.form['content']
-        furto.breed = request.form['breed']
-
-        try:
-            db.session.commit()
+        if request.method == 'POST':
+            new_content = request.form['content']
+            new_breed = request.form['breed']
+            cursor.execute("UPDATE collections SET content = %s, breed = %s WHERE id = %s", (new_content, new_breed, id))
+            conn.commit()
             return redirect('/collection')
-        except:
-            return 'There was an issue updating your furto, so sorry!'
-    else:
-        return render_template('update.html', task=furto)
+        else:
+            return render_template('update.html', task=furto)
+    except Exception as e:
+        print(f"Error: {e}")
+        return 'There was an issue updating your furto, so sorry!'
+    finally:
+        cursor.close()
 
 
 if __name__ == '__main__':

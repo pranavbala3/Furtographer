@@ -6,3 +6,4 @@ test.txt
 .ipynb_checkpoints
 datasets
 bottleneck_features
+.coverage
