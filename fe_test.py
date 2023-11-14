@@ -1,4 +1,4 @@
-from app import app, Collection, conn
+from app import app, Collection, conn, User
 import psycopg2
 import pytest
 import re
@@ -12,6 +12,109 @@ def client():
     client = app.test_client()
 
     yield client
+
+# Replace the following placeholders with your actual database 
+TEST_DB_HOST = 'localhost'
+TEST_DB_NAME = 'furtographer'
+TEST_DB_USER = 'admin'
+TEST_DB_PASSWORD = 'password'
+TEST_DB_PORT = 5431
+
+
+# Create a connection to the test database
+@pytest.fixture
+def test_conn():
+    conn = psycopg2.connect(host=TEST_DB_HOST, dbname=TEST_DB_NAME, user=TEST_DB_USER, password=TEST_DB_PASSWORD, port=TEST_DB_PORT)
+    yield conn
+    conn.close()
+
+# Test checking password for a valid user
+def test_check_password_valid_user(test_conn):
+    # Clear the users table before the test
+    cursor = test_conn.cursor()
+    cursor.execute("DELETE FROM users")
+    test_conn.commit()
+    
+    # Your test username and password
+    test_username = 'test_user'
+    test_password = 'test_password'
+
+    # Add a test user to the database
+    cursor = test_conn.cursor()
+    cursor.execute("INSERT INTO users (user_name, pwd) VALUES (%s, %s)", (test_username, test_password))
+    test_conn.commit()
+
+    # Call the check_password method
+    result = User.check_password(test_username, test_password)
+
+    # Check if the result is True (valid user)
+    assert result is True
+
+# Test checking password for an invalid user
+def test_check_password_invalid_user(test_conn):
+    # Clear the users table before the test
+    cursor = test_conn.cursor()
+    cursor.execute("DELETE FROM users")
+    test_conn.commit()
+
+    # Your test username and password
+    test_username = 'test_user'
+    test_password = 'test_password'
+
+    # Call the check_password method without adding the user to the database
+    result = User.check_password(test_username, test_password)
+
+    # Check if the result is False (invalid user)
+    assert result is False
+
+# Test getting all items from the collection
+def test_get_all_from_collection(client, test_conn):
+    # Clear the collections table before the test
+    cursor = test_conn.cursor()
+    cursor.execute("DELETE FROM collections")
+    test_conn.commit()
+    
+    # Your test content and breed
+    test_content = 'Test Content'
+    test_breed = 'Test Breed'
+
+    # Add a test item to the collection
+    cursor = test_conn.cursor()
+    cursor.execute("INSERT INTO collections (content, breed) VALUES (%s, %s)", (test_content, test_breed))
+    test_conn.commit()
+
+    # Call the get_all method
+    result = Collection.get_all()
+
+    # Check if the test item is in the result
+    assert len(result) == 1
+    assert result[0][1] == test_content
+    assert result[0][2] == test_breed
+
+# Test deleting an item from the collection
+def test_delete_from_collection(client, test_conn):
+    # Your test content and breed
+    test_content = 'Test Content'
+    test_breed = 'Test Breed'
+
+    # Add a test item to the collection
+    cursor = test_conn.cursor()
+    cursor.execute("INSERT INTO collections (content, breed) VALUES (%s, %s)", (test_content, test_breed))
+    test_conn.commit()
+
+    # Get the ID of the test item
+    cursor.execute("SELECT id FROM collections WHERE content = %s", (test_content,))
+    result = cursor.fetchone()
+    test_id = result[0]
+
+    # Call the delete method
+    Collection.delete(test_id)
+
+    # Check if the item is deleted from the database
+    cursor.execute("SELECT * FROM collections WHERE id = %s", (test_id,))
+    result = cursor.fetchone()
+
+    assert result is None
 
 # Test that the website works
 def test_home_page():
@@ -263,4 +366,4 @@ def test_upload_photo_page(client):
 # Sample test for uploading a photo
 
 
-#
+# Sample test for 
