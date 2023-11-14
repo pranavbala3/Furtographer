@@ -5,8 +5,6 @@ from tensorflow.keras.layers import GlobalAveragePooling2D, Dense
 from tensorflow.keras.applications.resnet50 import ResNet50
 from tensorflow.keras.applications.resnet50 import preprocess_input
 from tensorflow.keras.preprocessing import image
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
 from .globals import (
     dog_names,
     num_dog_breeds,
@@ -56,7 +54,7 @@ def load_detector_model():
     return ResNet50(weights='imagenet')
 
 
-def load_classifier(bottling_model, name=None):
+def load_classifier(bottling_model, name):
     model = Sequential()
     model.add(GlobalAveragePooling2D(input_shape=(bottling_model.layers[-1].
                                                   output_shape[1:])))
