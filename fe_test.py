@@ -44,8 +44,8 @@ def test_logout(client):
     # Check if the user is redirected to the home page
     assert b'What breed is this dog?' in response.data
 
-# Sample test for login
-def test_login(client):
+# Sample test for login page
+def test_login_page(client):
     # Simulate logging in
     response = client.post('/login', data=dict(username='admin', password='admin'), follow_redirects=True)
 
@@ -54,6 +54,27 @@ def test_login(client):
 
    # Check if the user is redirected to the home page
     assert b'Welcome, admin!' in response.data  
+
+#Sample test for logining in with wrong credentials
+def test_login_wrong_credentials(client):
+    # simulate clearing the users table
+    with app.app_context():
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM users")
+        conn.commit()
+    
+    # Simulate registering a new user
+    response = client.post('/register', data=dict(username='admin', password='admin', confirm_password='admin'), follow_redirects=True)
+    
+    # Simulate logging in
+    response = client.post('/login', data=dict(username='admin', password='wrong'), follow_redirects=True)
+
+    # Check if the response status code is 200 (OK)
+    assert response.status_code == 200
+
+   # Check if the user is redirected to the home page
+    assert b'Invalid username or password' in response.data
+
 
 # Sample test for the going to register page
 def test_register_page(client):
