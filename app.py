@@ -17,10 +17,12 @@ global capture
 global save
 global retake
 global latest_frame
+global latest_breedname
 capture = 0
 save = 0
 retake = 0
 latest_frame = None
+latest_breedname = None
 
 static_dir = 'static'
 photos_dir = os.path.join(static_dir, 'photos')
@@ -82,6 +84,7 @@ def generate_frames():
     global save
     global retake
     global latest_frame
+    global latest_breedname
 
     camera = cv2.VideoCapture(0)
     while camera.isOpened():
@@ -107,7 +110,11 @@ def generate_frames():
                 now = dt.datetime.now()
                 p = os.path.sep.join([photos_dir, "photo_{}.jpg".format(str(now).replace(":", ''))])
                 cv2.imwrite(p, frame_np)
-                Collection.add(p, "breed_placeholder")  # Replace "breed_placeholder" with the actual breed
+                breed = model.predict_path(p)
+                breedname = str(breed).replace('_', ' ')
+                latest_breedname = latest_breedname
+                print(latest_breedname)
+                # Collection.add(p, "breed_placeholder")  # Replace "breed_placeholder" with the actual breed
                 save = 0
             elif retake:
                 retake = 0
@@ -193,8 +200,6 @@ def register():
 
     return render_template('register.html')
 
-
-
 @app.route('/video')
 def video():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
@@ -202,7 +207,7 @@ def video():
 
 @app.route('/take_photo', methods=['POST', 'GET'])
 def take_photo():
-    return render_template('take_photo.html', title='Take Photo')
+    return render_template('take_photo.html', title='Take Photo', breedname = latest_breedname)
 
 
 @app.route('/tasks', methods=['POST', 'GET'])
@@ -213,18 +218,18 @@ def tasks():
             capture = 1
             generate_frames()
             # Trigger the display message
-            return render_template('take_photo.html', show_modal=True)
+            return render_template('take_photo.html', title='Take Photo' , show_modal=True, breedname = latest_breedname)
         elif request.form.get('click') == 'Save':
             global save
             save = 1
-            return render_template('take_photo.html', show_modal=False)
+            return render_template('take_photo.html', title='Take Photo', show_modal=False, breedname = latest_breedname)
         elif request.form.get('click') == 'Retake':
             global retake
             retake = 1
-            return render_template('take_photo.html', show_modal=False)
+            return render_template('take_photo.html', title='Take Photo', show_modal=False, breedname = latest_breedname)
         else:
             return "fail"
-    return render_template('take_photo.html', show_modal=False)
+    return render_template('take_photo.html', show_modal=False, breedname = latest_breedname)
 
 
 @app.route('/upload_photo')
@@ -242,7 +247,7 @@ def upload():
 
     if file:
         # for now, the file is just going to this directory, but we will need to connect this to our db/image storage system
-        file_path = os.path.join(uploads_dir,file.filename);
+        file_path = os.path.join(uploads_dir,file.filename)
         file.save(file_path)
 
         ### Classifying the File

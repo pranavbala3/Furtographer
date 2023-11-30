@@ -1,6 +1,9 @@
 {% extends "index.html" %}
 {% block content %}
     <div id="overlay" class="body-blur"></div>
+        {% if breedname == None%}
+            <p>Breed: {{ breedname }}</p>
+        {% endif %}
         <div id="camera-container">
             <div id="camera-frame">
                 <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
