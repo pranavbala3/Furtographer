@@ -10,7 +10,7 @@ body,
 html {
     margin: 0;
     font-family: sans-serif;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(249, 247, 245);
 }
 
 #navbar img {
@@ -19,6 +19,7 @@ html {
 
 .navbar {
     height: 52px;
+    background-color: rgb(78, 16, 16) !important;
 }
 
 .navbar-brand img {
@@ -95,7 +96,11 @@ td {
 }
 
 .delete-button {
-    background-color: red;
+    background-color: rgb(242, 106, 106);
+    border-radius: 10px; 
+    margin-top: -5px; 
+    color: #ffffff; 
+    text-align: center;
 }
 
 .modal {
@@ -129,7 +134,11 @@ td {
 }
 
 .update-button {
-    background-color: blue;
+    background-color: rgb(59, 59, 246);
+    border-radius: 10px; 
+    margin-top: -5px; 
+    color: #ffffff; 
+    text-align: center;
 }
 
 .login-button {
@@ -170,7 +179,7 @@ td {
     top: 70px;
     right: 20px;
     font-size: 2em;
-    background-color: #3498db;
+    background-color: rgb(156, 40, 4);
     color: #ffffff;
     padding: 10px 20px;
     border-radius: 5px;
