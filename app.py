@@ -252,7 +252,10 @@ def upload():
 
         ### Classifying the File
         breed = model.predict_path(file_path)
-        breedname = str(breed).replace('_', ' ')
+        if breed is None:
+            breedname = "picture without dawgs :("
+        else:
+            breedname = str(breed).replace('_', ' ')
         return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname, \
             uploaded_image_url=file_path)
 
@@ -264,6 +267,7 @@ def collection():
         task_content = request.form['content']
         task_breed = request.form['breed']
         try:
+            print("HERE, TEST")
             cursor = conn.cursor()
             cursor.execute("INSERT INTO collections (content, breed) VALUES (%s, %s)", (task_content, task_breed))
             conn.commit()
@@ -278,9 +282,11 @@ def collection():
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM collections ORDER BY date_created")
             tasks = cursor.fetchall()
+            # Add counts of total furtos tracking
+            total_furtos = cursor.rowcount # noff = number of furtos
             # Assuming the tuple structure is (id, content, breed, completed, date_created)
             tasks_with_headers = [{'id': row[0], 'content': row[1], 'breed': row[2], 'completed': row[3], 'date_created': row[4]} for row in tasks]
-            return render_template('collection.html', title='View Collection', tasks=tasks_with_headers, logged_in=logged_in, current_user=session.get('username'))
+            return render_template('collection.html', title='View Collection', noff = total_furtos, tasks=tasks_with_headers, logged_in=logged_in, current_user=session.get('username'))
         except Exception as e:
             print(f"Error: {e}")
             return 'There was an issue fetching furto data! Sorry!'

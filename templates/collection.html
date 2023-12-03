@@ -15,6 +15,36 @@
     </div>
 </div>
 
+{% if tasks|length > 0 %}
+<div class="counter" id="funCounter">
+    <span id="counterText">> Total Furtos to Date:</span>
+    <span id="counterValue">{{noff}}</span>
+</div>
+{% endif %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleButton = document.getElementById('funCounter');
+        var counterContainer = document.querySelector('.counter');
+        counterContainer.classList.add('bouncing');
+        var counterText = document.getElementById('counterText');
+
+        toggleButton.addEventListener('click', function() {
+        var currentRightValue = parseInt(getComputedStyle(counterContainer).right);
+
+        if (currentRightValue === 20) {
+            counterContainer.style.right = '-300px'; 
+            counterContainer.classList.remove('bouncing');
+            counterText.innerText = "< Total Furtos to Date:";
+        } else {
+            counterContainer.style.right = '20px';
+            counterContainer.classList.add('bouncing');
+            counterText.innerText = "> Total Furtos to Date:";
+        }
+        });
+    });
+</script>
+
 <div class="content">
     <form action="/collection" method="POST">
         <input type="text" name="content" id="content" placeholder="Pup Name...">
@@ -49,6 +79,7 @@
             </tr>
         {% endfor %}
     </table>
+
     {% endif %}
 </div>
 {% endblock %}
