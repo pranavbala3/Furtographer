@@ -29,5 +29,5 @@ services:
       - "FLYWAY_PASSWORD=password"
       - "FLYWAY_CONFIG_FILES=/flyway/scripts/flyway.conf"
     volumes:
-      - "${PWD}/sql:/flyway/sql"
-      - "${PWD}/scripts:/flyway/scripts"
+      - "./sql:/flyway/sql"
+      - "./scripts:/flyway/scripts"

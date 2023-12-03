@@ -164,3 +164,42 @@ td {
     right: 10px;
     cursor: pointer;
 }
+
+.counter {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    font-size: 2em;
+    background-color: #3498db;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    /* animation: bounce 0.5s infinite alternate; */
+    cursor: pointer;
+}
+
+.bouncing {
+    animation: bounce 0.5s infinite alternate;
+}
+
+.counter-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    transition: right 0.3s ease; /* Add transition for smooth animation */
+  }
+
+#toggleButton {
+cursor: pointer;
+margin-right: 5px;
+}
+
+
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-5px);
+    }
+}

@@ -256,7 +256,10 @@ def upload():
 
         ### Classifying the File
         breed = model.predict_path(file_path)
-        breedname = str(breed).replace('_', ' ')
+        if breed is None:
+            breedname = "picture without dawgs :("
+        else:
+            breedname = str(breed).replace('_', ' ')
         return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname, \
             uploaded_image_url=file_path)
 
