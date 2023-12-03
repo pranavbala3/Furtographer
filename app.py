@@ -18,11 +18,14 @@ global save
 global retake
 global latest_frame
 global latest_breedname
+global photo_path
+
 capture = 0
 save = 0
 retake = 0
 latest_frame = None
 latest_breedname = None
+photo_path = None
 
 static_dir = 'static'
 photos_dir = os.path.join(static_dir, 'photos')
@@ -112,9 +115,10 @@ def generate_frames():
                 cv2.imwrite(p, frame_np)
                 breed = model.predict_path(p)
                 breedname = str(breed).replace('_', ' ')
-                latest_breedname = latest_breedname
-                print(latest_breedname)
-                # Collection.add(p, "breed_placeholder")  # Replace "breed_placeholder" with the actual breed
+                latest_breedname = breedname
+                photo_path = p
+                print(photo_path)
+                Collection.add(p, latest_breedname)
                 save = 0
             elif retake:
                 retake = 0
@@ -207,7 +211,7 @@ def video():
 
 @app.route('/take_photo', methods=['POST', 'GET'])
 def take_photo():
-    return render_template('take_photo.html', title='Take Photo', breedname = latest_breedname)
+    return render_template('take_photo.html', title='Take Photo', upload=False, breed=latest_breedname)
 
 
 @app.route('/tasks', methods=['POST', 'GET'])
@@ -218,18 +222,18 @@ def tasks():
             capture = 1
             generate_frames()
             # Trigger the display message
-            return render_template('take_photo.html', title='Take Photo' , show_modal=True, breedname = latest_breedname)
+            return render_template('take_photo.html', title='Take Photo' , show_modal=True, upload=False, breed=latest_breedname)
         elif request.form.get('click') == 'Save':
             global save
             save = 1
-            return render_template('take_photo.html', title='Take Photo', show_modal=False, breedname = latest_breedname)
+            return render_template('take_photo.html', title='Take Photo', show_modal=False, upload=True, breed=latest_breedname, uploaded_image_url=photo_path)
         elif request.form.get('click') == 'Retake':
             global retake
             retake = 1
-            return render_template('take_photo.html', title='Take Photo', show_modal=False, breedname = latest_breedname)
+            return render_template('take_photo.html', title='Take Photo', show_modal=False, upload=False, breed=latest_breedname)
         else:
             return "fail"
-    return render_template('take_photo.html', show_modal=False, breedname = latest_breedname)
+    return render_template('take_photo.html', show_modal=False, upload=False, breed=latest_breedname)
 
 
 @app.route('/upload_photo')
