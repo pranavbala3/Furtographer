@@ -209,7 +209,8 @@ def video():
 
 @app.route('/take_photo', methods=['POST', 'GET'])
 def take_photo():
-    return render_template('take_photo.html', title='Take Photo', breedname = latest_breedname)
+    logged_in = 'username' in session
+    return render_template('take_photo.html', logged_in=logged_in, current_user=session.get('username'), title='Take Photo', breedname = latest_breedname)
 
 
 @app.route('/tasks', methods=['POST', 'GET'])
@@ -236,7 +237,8 @@ def tasks():
 
 @app.route('/upload_photo')
 def upload_photo():
-    return render_template('upload_photo.html', title='Upload Photo')
+    logged_in = 'username' in session
+    return render_template('upload_photo.html', logged_in=logged_in, current_user=session.get('username'), title='Upload Photo')
 
 
 @app.route('/upload', methods=['POST', 'GET'])
