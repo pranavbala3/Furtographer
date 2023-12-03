@@ -1,9 +1,17 @@
 {% extends "index.html" %}
 {% block content %}
+    {% if upload%}
+        <script>
+            openPopup();
+            closePopup();
+        </script>
+        <p style="color: rgb(0, 255, 76); text-align: center;">Furto Captured!</p>
+        <p style="color: rgb(0, 0, 0); text-align: center;">It seems like you uploaded a {{breed}}</p>
+        <div style="margin: auto; display: inline-block; text-align: left">
+            <img src="{{ uploaded_image_url }}" style="max-width: 800px; max-height: 500px;" alt="uploaded image">
+        </div>
+    {% endif %}
     <div id="overlay" class="body-blur"></div>
-        {% if breedname == None%}
-            <p>Breed: {{ breedname }}</p>
-        {% endif %}
         <div id="camera-container">
             <div id="camera-frame">
                 <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
@@ -99,5 +107,23 @@
         }
         // Add click event handler to the camera toggle button
         document.getElementById('camera-toggle').addEventListener('click', toggleCamera);
+
+        // Open the popup
+        function openPopup() {
+            document.getElementById("popup").style.display = "block";
+        }
+
+        // Close the popup
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+
+        // Close the popup if the user clicks outside of it
+        window.onclick = function(event) {
+            var popup = document.getElementById("popup");
+            if (event.target == popup) {
+                popup.style.display = "none";
+            }
+        };
     </script>
 {% endblock%}
