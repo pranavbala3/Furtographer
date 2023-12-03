@@ -53,15 +53,15 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 
 class Collection:
     @staticmethod
-    def add(content, breed):
+    def add(content, breed, user_id):
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO collections (content, breed) VALUES (%s, %s)", (content, breed))
+        cursor.execute("INSERT INTO collections (content, breed, user_id) VALUES (%s, %s, %s)", (content, breed, user_id))
         conn.commit()
 
     @staticmethod
-    def get_all():
+    def get_all(user_id):
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM collections ORDER BY date_created")
+        cursor.execute("SELECT * FROM collections WHERE user_id = %s ORDER BY date_created", (user_id,))
         return cursor.fetchall()
 
     @staticmethod
@@ -146,6 +146,7 @@ def login():
 
             if user:
                 session['username'] = user[1]
+                session['user_id'] = user[0]  # Set user_id in the session
                 return redirect('/')
             else:
                 return render_template('login.html', login_failed=True)
@@ -260,32 +261,28 @@ def upload():
 @app.route('/collection', methods=['POST', 'GET'])
 def collection():
     logged_in = 'username' in session
-    if request.method == 'POST':
-        task_content = request.form['content']
-        task_breed = request.form['breed']
-        try:
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO collections (content, breed) VALUES (%s, %s)", (task_content, task_breed))
-            conn.commit()
-            return redirect('/collection')
-        except Exception as e:
-            print(f"Error: {e}")
-            return 'There was an issue adding your furto! Sorry!'
-        finally:
-            cursor.close()
+    if logged_in:
+        # Get the user_id from the database using a sql query
+        user_id = session.get('user_id')
+        if request.method == 'POST':
+            task_content = request.form['content']
+            task_breed = request.form['breed']
+            try:
+                Collection.add(task_content, task_breed, user_id)
+                return redirect('/collection')
+            except Exception as e:
+                print(f"Error: {e}")
+                return 'There was an issue adding your furto! Sorry!'
+        else:
+            try:
+                tasks = Collection.get_all(user_id)
+                tasks_with_headers = [{'id': row[0], 'content': row[1], 'breed': row[2], 'completed': row[3], 'date_created': row[4]} for row in tasks]
+                return render_template('collection.html', title='View Collection', tasks=tasks_with_headers, logged_in=logged_in, current_user=session.get('username'))
+            except Exception as e:
+                print(f"Error: {e}")
+                return 'There was an issue fetching furto data! Sorry!'
     else:
-        try:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM collections ORDER BY date_created")
-            tasks = cursor.fetchall()
-            # Assuming the tuple structure is (id, content, breed, completed, date_created)
-            tasks_with_headers = [{'id': row[0], 'content': row[1], 'breed': row[2], 'completed': row[3], 'date_created': row[4]} for row in tasks]
-            return render_template('collection.html', title='View Collection', tasks=tasks_with_headers, logged_in=logged_in, current_user=session.get('username'))
-        except Exception as e:
-            print(f"Error: {e}")
-            return 'There was an issue fetching furto data! Sorry!'
-        finally:
-            cursor.close()
+        return redirect('/login')
 
 @app.route('/delete/<int:id>')
 def delete(id):
