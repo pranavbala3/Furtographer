@@ -217,7 +217,8 @@ def video():
 
 @app.route('/take_photo', methods=['POST', 'GET'])
 def take_photo():
-    return render_template('take_photo.html', title='Take Photo', upload=False, breed=latest_breedname)
+    logged_in = 'username' in session
+    return render_template('take_photo.html', logged_in=logged_in, current_user=session.get('username'), title='Take Photo', breedname = latest_breedname)
 
 
 @app.route('/tasks', methods=['POST', 'GET'])
