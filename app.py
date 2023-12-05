@@ -30,10 +30,12 @@ retake = 0
 latest_frame = None
 latest_breedname = None
 photo_path = None
+captured_frame = None
 
 static_dir = 'static'
 photos_dir = os.path.join(static_dir, 'photos')
 uploads_dir = os.path.join(static_dir, 'uploads')
+
 
 try:
     os.mkdir(photos_dir)
@@ -99,7 +101,7 @@ def generate_frames():
     global latest_frame
     global latest_breedname
     global photo_path
-    global last_prediction_time
+    global captured_frame
 
     camera = cv2.VideoCapture(0)
     while camera.isOpened():
@@ -123,20 +125,32 @@ def generate_frames():
                 last_prediction_time = current_time
         if capture:
             capture = 0
+            captured_frame = frame
             while not save and not retake:
                 pass
-            if save:
-                frame_np = np.asarray(frame)
-                now = dt.datetime.now()
-                p = os.path.sep.join([photos_dir, "photo_{}.jpg".format(str(now).replace(":", ''))])
-                cv2.imwrite(p, frame_np)
-                breed = model.predict_path(p)
-                latest_breedname = breed
-                photo_path = p
-                save = 0
-            elif retake:
-                retake = 0
     camera.release()
+
+
+def save_image():
+    global save
+    global retake
+    global photo_path
+    global latest_breedname
+    global captured_frame
+
+    if save:
+        frame_np = np.asarray(captured_frame)
+        now = dt.datetime.now()
+        p = os.path.sep.join([photos_dir, "photo_{}.jpg".format(str(now).replace(":", ''))])
+        cv2.imwrite(p, frame_np)
+        breed = model.predict_path(p)
+        breedname = str(breed).replace('_', ' ')
+        latest_breedname = breedname
+        photo_path = p
+        save = 0
+    elif retake:
+        retake = 0
+
 
 @app.route('/captured_frame')
 def captured_frame():
@@ -231,20 +245,16 @@ def video():
 
 @app.route('/take_photo', methods=['POST', 'GET'])
 def take_photo():
-    global photo_path
-    global latest_breedname
     logged_in = 'username' in session
-
-    if photo_path and latest_breedname:
-        Collection.add(photo_path, latest_breedname, session.get('user_id'))
-        photo_path = None
-        latest_breedname = None
-
     return render_template('take_photo.html', logged_in=logged_in, current_user=session.get('username'), title='Take Photo', breedname = latest_breedname)
 
 
 @app.route('/tasks', methods=['POST', 'GET'])
 def tasks():
+    global photo_path
+    global latest_breedname
+    print(f"photo path 1: {photo_path}")
+    print(f"breedname 1: {latest_breedname}")
     logged_in = 'username' in session
     if request.method == 'POST':
         if request.form.get('click') == 'Capture':
@@ -252,18 +262,22 @@ def tasks():
             capture = 1
             generate_frames()
             # Trigger the display message
-            return render_template('take_photo.html', logged_in=logged_in, title='Take Photo' , show_modal=True, upload=False, breed=latest_breedname)
+            return render_template('take_photo.html', logged_in=logged_in, title='Take Photo', show_modal=True, upload=False, breed=latest_breedname, uploaded_image_url=photo_path)
         elif request.form.get('click') == 'Save':
             global save
+            print(f"photo path: {photo_path}")
+            print(f"breedname: {latest_breedname}")
             save = 1
+            save_image()
+            if photo_path:
+                Collection.add(photo_path, latest_breedname, session.get('user_id'))
             return render_template('take_photo.html', logged_in=logged_in,  title='Take Photo', show_modal=False, upload=True, breed=latest_breedname, uploaded_image_url=photo_path)
         elif request.form.get('click') == 'Retake':
             global retake
             retake = 1
-            return render_template('take_photo.html', logged_in=logged_in, title='Take Photo', show_modal=False, upload=False, breed=latest_breedname)
+            return render_template('take_photo.html', logged_in=logged_in, title='Take Photo', show_modal=False, upload=False, breed=latest_breedname, uploaded_image_url=photo_path)
         else:
             return "fail"
-    return render_template('take_photo.html', logged_in=logged_in, show_modal=False, upload=False, breed=latest_breedname)
 
 
 @app.route('/upload_photo')
