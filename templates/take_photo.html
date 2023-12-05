@@ -12,15 +12,21 @@
         </div>
     {% endif %}
     <div id="overlay" class="body-blur"></div>
-        <div id="camera-container">
-            <div id="camera-frame">
-                <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
-            </div>
-            <form method="POST" enctype="multipart/form-data" action="/tasks">
-                <button type="submit" class="btn btn-lg btn-primary" name="click" value="Capture" onclick="captureImage()">Capture</button>
-            </form>
-            <button id="camera-toggle" class="btn btn-lg btn-primary">Turn Camera On</button>
+    <div id="camera-container">
+        <div id="camera-frame">
+            <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
         </div>
+        <form method="POST" enctype="multipart/form-data" action="/tasks">
+            <button type="submit" class="btn btn-lg btn-primary" name="click" value="Capture" onclick="captureImage()">Capture</button>
+        </form>
+        <div class="button-spacing"></div>
+        <button id="camera-toggle" class="btn btn-lg btn-primary">Turn Camera On</button>
+    </div>
+    <style>
+        .button-spacing {
+            margin-bottom: 10px; /* Adjust the margin to your preference */
+        }
+    </style>        
         <div id="myModal" class="modal">
             <div class="modal-content">
                 <p>Do you want to save the picture or retake?</p>
