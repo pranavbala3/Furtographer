@@ -13,7 +13,7 @@
     {% endif %}
     <div id="overlay" class="body-blur"></div>
     <div id="camera-container">
-      <p id="curBreedShower" style="color: rgb(0, 0, 0); text-align: center;">It seems like you uploaded a {{breed}}</p>
+      <p id="curBreedShower" style="color: rgb(0, 0, 0); text-align: center;">We are detecting no dawgs</p>
         <div id="camera-frame">
             <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
         </div>
@@ -58,8 +58,14 @@
            console.log("running");
             fetch('/get_breed')
                 .then(response => response.json())
-                .then(data => {
-                    curBreedShower.innerText = `We are detecting a: ${data.breed}`;
+               .then(data => {
+                   if (data.breed == "None") {
+                       curBreedShower.innerText = `We are detecting no dawgs`;
+                   } else if (data.breed != null) {
+                       curBreedShower.innerText = `We are detecting a: ${data.breed}`;
+                   } else {
+                       curBreedShower.innerText = `We are detecting no dawgs`;
+                   }
                 })
                 .catch(error => {
                     console.error('Error fetching breed:', error);
