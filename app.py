@@ -239,24 +239,21 @@ def tasks():
             capture = 1
             generate_frames()
             # Trigger the display message
-            return render_template('take_photo.html', logged_in=logged_in, title='Take Photo' , show_modal=True, upload=False, breed=latest_breedname)
+            return render_template('take_photo.html', logged_in=logged_in, title='Take Photo' , show_modal=True, upload=False, breed=latest_breedname, uploaded_image_url=photo_path)
         elif request.form.get('click') == 'Save':
             global save
             save = 1
             print(f"photo path: {photo_path}")
             print(f"breedname: {latest_breedname}")
-            if photo_path and latest_breedname:
+            if photo_path:
                 Collection.add(photo_path, latest_breedname, session.get('user_id'))
-                photo_path = None
-                latest_breedname = None
             return render_template('take_photo.html', logged_in=logged_in,  title='Take Photo', show_modal=False, upload=True, breed=latest_breedname, uploaded_image_url=photo_path)
         elif request.form.get('click') == 'Retake':
             global retake
             retake = 1
-            return render_template('take_photo.html', logged_in=logged_in, title='Take Photo', show_modal=False, upload=False, breed=latest_breedname)
+            return render_template('take_photo.html', logged_in=logged_in, title='Take Photo', show_modal=False, upload=False, breed=latest_breedname, uploaded_image_url=photo_path)
         else:
             return "fail"
-    return render_template('take_photo.html', logged_in=logged_in, show_modal=False, upload=False, breed=latest_breedname)
 
 
 @app.route('/upload_photo')
