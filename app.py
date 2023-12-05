@@ -62,9 +62,15 @@ class Collection:
         conn.commit()
 
     @staticmethod
-    def get_all(user_id):
+    def get_all_by_date(user_id):
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM collections WHERE user_id = %s ORDER BY date_created", (user_id,))
+        cursor.execute("SELECT * FROM collections WHERE user_id = %s ORDER BY date_created DESC", (user_id,))
+        return cursor.fetchall()
+    
+    @staticmethod
+    def get_all_by_breed(user_id):
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM collections WHERE user_id = %s ORDER BY breed", (user_id,))
         return cursor.fetchall()
 
     @staticmethod
@@ -288,9 +294,18 @@ def collection():
                 return 'There was an issue adding your furto! Sorry!'
         else:
             try:
-                tasks = Collection.get_all(user_id)
+                # Retrieve the sort value from the form
+                sort_value = request.args.get('sort', 'date')
+                print(sort_value)
+                if (sort_value == 'date'):
+                    tasks = Collection.get_all_by_date(user_id)
+                elif(sort_value == 'breed'):
+                    tasks = Collection.get_all_by_breed(user_id)
+                else:
+                    tasks = Collection.get_all_by_date(user_id)
+                
                 tasks_with_headers = [{'id': row[0], 'content': row[1], 'breed': row[2], 'completed': row[3], 'date_created': row[4]} for row in tasks]
-                return render_template('collection.html', title='View Collection', tasks=tasks_with_headers, logged_in=logged_in, current_user=session.get('username'))
+                return render_template('collection.html', title='View Collection', tasks=tasks_with_headers, logged_in=logged_in, current_user=session.get('username'), sort_value=sort_value)
             except Exception as e:
                 print(f"Error: {e}")
                 return 'There was an issue fetching furto data! Sorry!'

@@ -51,6 +51,13 @@
         <input type="text" name="breed" id="breed" class="breed" placeholder="Breed">
         <input type="submit" value="Add Furto, Breed">
     </form>
+
+    <form action="/collection" method="GET" id="sortForm">
+        <select name="sort" id="sort" onchange="this.form.submit()">
+            <option value="date" {% if sort_value == 'date' %}selected{% endif %}>Sort by Date</option>
+            <option value="breed" {% if sort_value == 'breed' %}selected{% endif %}>Sort by Breed</option>
+        </select>
+    </form>
     {% if tasks|length < 1 %}
     <h4 style="text-align: center;"> No Furtos Added :( Add your furry friend above! </h4> 
     {% else %}
