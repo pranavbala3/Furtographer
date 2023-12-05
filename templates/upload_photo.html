@@ -1,10 +1,16 @@
 {% extends "index.html" %}
 {% block content %}
 <div>
-    <form method="POST" enctype="multipart/form-data" action="/upload">
-        <input type="file" name="file">
-        <input type="submit" value="Upload" onclick="openPopup()">
+    <form method="POST" enctype="multipart/form-data" action="/upload" class="upload-form">
+        <label for="file" class="file-label">
+            <span class="file-icon">&#x1F4F7;</span> <!-- File icon, you can customize this -->
+            <span id="file-label-text">Choose a file</span>
+        </label>
+        <input type="file" name="file" id="file" class="file-input" onchange="displayFileName(this)" style="display: none;">
+        <button type="submit" class="upload-btn" onclick="openPopup()">Upload</button>
+        <span id="file-name" class="file-name"></span> <!-- To display selected file name -->
     </form>
+    
 
     <div id="popup" class="popup">
         <div class="popup-content">
@@ -44,5 +50,11 @@
             popup.style.display = "none";
         }
     };
+
+    // Display selected file name
+    function displayFileName(input) {
+        var fileName = input.files[0].name;
+        document.getElementById("file-label-text").innerText = fileName;
+    }
 </script>
 {% endblock %}
