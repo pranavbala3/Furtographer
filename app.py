@@ -304,8 +304,11 @@ def collection():
                 else:
                     tasks = Collection.get_all_by_date(user_id)
                 
+                # Add counts of total furtos tracking
+                total_furtos = len(tasks)
+                print(total_furtos)
                 tasks_with_headers = [{'id': row[0], 'content': row[1], 'breed': row[2], 'completed': row[3], 'date_created': row[4]} for row in tasks]
-                return render_template('collection.html', title='View Collection', tasks=tasks_with_headers, logged_in=logged_in, current_user=session.get('username'), sort_value=sort_value)
+                return render_template('collection.html', title='View Collection', noff=total_furtos, tasks=tasks_with_headers, logged_in=logged_in, current_user=session.get('username'), sort_value=sort_value)
             except Exception as e:
                 print(f"Error: {e}")
                 return 'There was an issue fetching furto data! Sorry!'
