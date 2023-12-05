@@ -26,10 +26,12 @@ retake = 0
 latest_frame = None
 latest_breedname = None
 photo_path = None
+captured_frame = None
 
 static_dir = 'static'
 photos_dir = os.path.join(static_dir, 'photos')
 uploads_dir = os.path.join(static_dir, 'uploads')
+
 
 try:
     os.mkdir(photos_dir)
@@ -66,7 +68,7 @@ class Collection:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM collections WHERE user_id = %s ORDER BY date_created DESC", (user_id,))
         return cursor.fetchall()
-    
+
     @staticmethod
     def get_all_by_breed(user_id):
         cursor = conn.cursor()
@@ -95,6 +97,7 @@ def generate_frames():
     global latest_frame
     global latest_breedname
     global photo_path
+    global captured_frame
 
     camera = cv2.VideoCapture(0)
     while camera.isOpened():
@@ -113,21 +116,32 @@ def generate_frames():
             )
         if capture:
             capture = 0
+            captured_frame = frame
             while not save and not retake:
                 pass
-            if save:
-                frame_np = np.asarray(frame)
-                now = dt.datetime.now()
-                p = os.path.sep.join([photos_dir, "photo_{}.jpg".format(str(now).replace(":", ''))])
-                cv2.imwrite(p, frame_np)
-                breed = model.predict_path(p)
-                breedname = str(breed).replace('_', ' ')
-                latest_breedname = breedname
-                photo_path = p
-                save = 0
-            elif retake:
-                retake = 0
     camera.release()
+
+
+def save_image():
+    global save
+    global retake
+    global photo_path
+    global latest_breedname
+    global captured_frame
+
+    if save:
+        frame_np = np.asarray(captured_frame)
+        now = dt.datetime.now()
+        p = os.path.sep.join([photos_dir, "photo_{}.jpg".format(str(now).replace(":", ''))])
+        cv2.imwrite(p, frame_np)
+        breed = model.predict_path(p)
+        breedname = str(breed).replace('_', ' ')
+        latest_breedname = breedname
+        photo_path = p
+        save = 0
+    elif retake:
+        retake = 0
+
 
 @app.route('/captured_frame')
 def captured_frame():
@@ -222,7 +236,7 @@ def video():
 
 @app.route('/take_photo', methods=['POST', 'GET'])
 def take_photo():
-    logged_in = 'username' in session        
+    logged_in = 'username' in session
     return render_template('take_photo.html', logged_in=logged_in, current_user=session.get('username'), title='Take Photo', breedname = latest_breedname)
 
 
@@ -239,12 +253,13 @@ def tasks():
             capture = 1
             generate_frames()
             # Trigger the display message
-            return render_template('take_photo.html', logged_in=logged_in, title='Take Photo' , show_modal=True, upload=False, breed=latest_breedname, uploaded_image_url=photo_path)
+            return render_template('take_photo.html', logged_in=logged_in, title='Take Photo', show_modal=True, upload=False, breed=latest_breedname, uploaded_image_url=photo_path)
         elif request.form.get('click') == 'Save':
             global save
-            save = 1
             print(f"photo path: {photo_path}")
             print(f"breedname: {latest_breedname}")
+            save = 1
+            save_image()
             if photo_path:
                 Collection.add(photo_path, latest_breedname, session.get('user_id'))
             return render_template('take_photo.html', logged_in=logged_in,  title='Take Photo', show_modal=False, upload=True, breed=latest_breedname, uploaded_image_url=photo_path)
@@ -283,7 +298,7 @@ def upload():
             breedname = str(breed).replace('_', ' ')
 
         # Save file information to the database
-        Collection.add(file_path, breedname, session.get('user_id'))    
+        Collection.add(file_path, breedname, session.get('user_id'))
         return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname, \
             uploaded_image_url=file_path)
 
@@ -314,7 +329,7 @@ def collection():
                     tasks = Collection.get_all_by_breed(user_id)
                 else:
                     tasks = Collection.get_all_by_date(user_id)
-                
+
                 # Add counts of total furtos tracking
                 total_furtos = len(tasks)
                 print(total_furtos)
