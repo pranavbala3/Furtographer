@@ -331,24 +331,40 @@ def delete(id):
 
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
-    try:
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM collections WHERE id = %s", (id,))
-        furto = cursor.fetchone()
+    logged_in = 'username' in session
+    if logged_in:
+        user_id = session.get('user_id')
+        if request.method == 'GET':
+            try:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM collections WHERE id = %s AND user_id = %s", (id, user_id))
+                task = cursor.fetchone()
+                cursor.close()
 
-        if request.method == 'POST':
-            new_content = request.form['content']
-            new_breed = request.form['breed']
-            cursor.execute("UPDATE collections SET content = %s, breed = %s WHERE id = %s", (new_content, new_breed, id))
-            conn.commit()
-            return redirect('/collection')
-        else:
-            return render_template('update.html', task=furto)
-    except Exception as e:
-        print(f"Error: {e}")
-        return 'There was an issue updating your furto, so sorry!'
-    finally:
-        cursor.close()
+                if task:
+                    return render_template('update.html', title='Update Furto', task={'id': task[0], 'content': task[1], 'breed': task[2]}, logged_in=logged_in, current_user=session.get('username'))
+                else:
+                    return 'Task not found or unauthorized to update.'
+            except Exception as e:
+                print(f"Error: {e}")
+                return 'There was an issue fetching furto data! Sorry!'
+
+        elif request.method == 'POST':
+            try:
+                new_content = request.form['content']
+                new_breed = request.form['breed']
+
+                cursor = conn.cursor()
+                cursor.execute("UPDATE collections SET content = %s, breed = %s WHERE id = %s AND user_id = %s", (new_content, new_breed, id, user_id))
+                conn.commit()
+                cursor.close()
+
+                return redirect('/collection')
+            except Exception as e:
+                print(f"Error: {e}")
+                return 'There was an issue updating the furto. Sorry!'
+    else:
+        return redirect('/login')
 
 
 if __name__ == '__main__':
