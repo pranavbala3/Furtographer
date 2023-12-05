@@ -102,6 +102,7 @@ def generate_frames():
     global latest_breedname
     global photo_path
     global captured_frame
+    global last_prediction_time
 
     camera = cv2.VideoCapture(0)
     while camera.isOpened():
