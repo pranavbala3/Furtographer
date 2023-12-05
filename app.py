@@ -1,6 +1,7 @@
 import cv2
 import datetime as dt
 import psycopg2
+import time
 from flask import (
     Flask, render_template, Response,
     request, redirect, session
@@ -10,6 +11,9 @@ import os
 from model.model import (
     Model,
 )
+
+PREDICT_DELAY = 3
+last_prediction_time = time.time()
 
 model = Model()
 
@@ -114,6 +118,11 @@ def generate_frames():
                 b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n'
             )
+            current_time = time.time()
+            if (current_time - last_prediction_time) >= PREDICT_DELAY:
+                breed = model.predict_frame(frame)
+                print(f"Breed from capture {breed}")
+                last_prediction_time = current_time
         if capture:
             capture = 0
             captured_frame = frame
