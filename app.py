@@ -250,6 +250,7 @@ def register():
 
     return render_template('register.html')
 
+
 @app.route('/video')
 def video():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
@@ -362,6 +363,7 @@ def collection():
     else:
         return redirect('/login')
 
+
 @app.route('/delete/<int:id>')
 def delete(id):
     try:
@@ -374,6 +376,7 @@ def delete(id):
         return 'There was a problem deleting that task'
     finally:
         cursor.close()
+
 
 @app.route('/update/<int:id>', methods=['GET', 'POST'])
 def update(id):
