@@ -1,6 +1,7 @@
 import cv2
 import datetime as dt
 import psycopg2
+import time
 from flask import (
     Flask, render_template, Response,
     request, redirect, session
@@ -10,6 +11,9 @@ import os
 from model.model import (
     Model,
 )
+
+PREDICT_DELAY = 3
+last_prediction_time = time.time()
 
 model = Model()
 
@@ -66,7 +70,7 @@ class Collection:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM collections WHERE user_id = %s ORDER BY date_created DESC", (user_id,))
         return cursor.fetchall()
-    
+
     @staticmethod
     def get_all_by_breed(user_id):
         cursor = conn.cursor()
@@ -95,6 +99,7 @@ def generate_frames():
     global latest_frame
     global latest_breedname
     global photo_path
+    global last_prediction_time
 
     camera = cv2.VideoCapture(0)
     while camera.isOpened():
@@ -111,6 +116,11 @@ def generate_frames():
                 b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame_buffer + b'\r\n'
             )
+            current_time = time.time()
+            if (current_time - last_prediction_time) >= PREDICT_DELAY:
+                breed = model.predict_frame(frame)
+                print(f"Breed from capture {breed}")
+                last_prediction_time = current_time
         if capture:
             capture = 0
             while not save and not retake:
@@ -121,8 +131,7 @@ def generate_frames():
                 p = os.path.sep.join([photos_dir, "photo_{}.jpg".format(str(now).replace(":", ''))])
                 cv2.imwrite(p, frame_np)
                 breed = model.predict_path(p)
-                breedname = str(breed).replace('_', ' ')
-                latest_breedname = breedname
+                latest_breedname = breed
                 photo_path = p
                 save = 0
             elif retake:
@@ -225,12 +234,12 @@ def take_photo():
     global photo_path
     global latest_breedname
     logged_in = 'username' in session
-    
+
     if photo_path and latest_breedname:
         Collection.add(photo_path, latest_breedname, session.get('user_id'))
         photo_path = None
         latest_breedname = None
-        
+
     return render_template('take_photo.html', logged_in=logged_in, current_user=session.get('username'), title='Take Photo', breedname = latest_breedname)
 
 
@@ -284,7 +293,7 @@ def upload():
             breedname = str(breed).replace('_', ' ')
 
         # Save file information to the database
-        Collection.add(file_path, breedname, session.get('user_id'))    
+        Collection.add(file_path, breedname, session.get('user_id'))
         return render_template('upload_photo.html', title='Upload Photo', upload_error=False, upload=True, breed=breedname, \
             uploaded_image_url=file_path)
 
@@ -315,7 +324,7 @@ def collection():
                     tasks = Collection.get_all_by_breed(user_id)
                 else:
                     tasks = Collection.get_all_by_date(user_id)
-                
+
                 # Add counts of total furtos tracking
                 total_furtos = len(tasks)
                 print(total_furtos)
