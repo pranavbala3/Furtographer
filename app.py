@@ -4,7 +4,8 @@ import psycopg2
 import time
 from flask import (
     Flask, render_template, Response,
-    request, redirect, session
+    request, redirect, session,
+    jsonify
     )
 import numpy as np
 import os
@@ -23,6 +24,7 @@ global retake
 global latest_frame
 global latest_breedname
 global photo_path
+global cur_breed
 
 capture = 0
 save = 0
@@ -103,6 +105,7 @@ def generate_frames():
     global photo_path
     global captured_frame
     global last_prediction_time
+    global cur_breed
 
     camera = cv2.VideoCapture(0)
     while camera.isOpened():
@@ -121,8 +124,8 @@ def generate_frames():
             )
             current_time = time.time()
             if (current_time - last_prediction_time) >= PREDICT_DELAY:
-                breed = model.predict_frame(frame)
-                print(f"Breed from capture {breed}")
+                cur_breed = model.predict_frame(frame)
+                print(f"Breed from capture {cur_breed}")
                 last_prediction_time = current_time
         if capture:
             capture = 0
@@ -131,6 +134,14 @@ def generate_frames():
                 pass
     camera.release()
 
+
+@app.route('/get_breed')
+def get_breed():
+    global cur_breed
+    # You should replace this with your logic to update cur_breed
+    # For now, we're just simulating some asynchronous process
+    time.sleep(3)
+    return jsonify({'breed': cur_breed})
 
 def save_image():
     global save

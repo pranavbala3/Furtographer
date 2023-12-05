@@ -13,6 +13,7 @@
     {% endif %}
     <div id="overlay" class="body-blur"></div>
     <div id="camera-container">
+      <p id="curBreedShower" style="color: rgb(0, 0, 0); text-align: center;">It seems like you uploaded a {{breed}}</p>
         <div id="camera-frame">
             <img src="{{ url_for('video') }}" width="640" height="480" style="border: 1px solid #000;">
         </div>
@@ -24,9 +25,9 @@
     </div>
     <style>
         .button-spacing {
-            margin-bottom: 10px; /* Adjust the margin to your preference */
+            margin-bottom: 10px;
         }
-    </style>        
+    </style>
         <div id="myModal" class="modal">
             <div class="modal-content">
                 <p>Do you want to save the picture or retake?</p>
@@ -42,14 +43,30 @@
             </div>
         </div>
     </div>
-    <script>
+<script>
         // show the modal
         function showModal() {
             var modal = document.getElementById('myModal');
             modal.style.display = 'block';
 
             document.body.style.overflow = 'hidden';
-        }   
+        }
+
+       const curBreedShower = document.getElementById('curBreedShower');
+       function updateBreed() {
+           // Make an AJAX request to get the latest breed from the server
+           console.log("running");
+            fetch('/get_breed')
+                .then(response => response.json())
+                .then(data => {
+                    curBreedShower.innerText = `We are detecting a: ${data.breed}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching breed:', error);
+                });
+        }
+
+        setInterval(updateBreed, 3000);
 
         // click event handlers for the save and retake buttons
         document.getElementById('saveBtn').addEventListener('click', function() {
@@ -70,7 +87,7 @@
 
             document.body.style.overflow = 'auto';
         }
-        
+
         function showBlur() {
             document.getElementById('overlay').style.display = 'block';
         }
@@ -92,7 +109,7 @@
         {% if show_modal %}
             captureImage()
         {% endif %}
-        
+
         // Initialize camera status
         let isCameraOn = false;
         // Function to toggle the camera on and off
