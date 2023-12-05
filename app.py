@@ -222,20 +222,16 @@ def video():
 
 @app.route('/take_photo', methods=['POST', 'GET'])
 def take_photo():
-    global photo_path
-    global latest_breedname
-    logged_in = 'username' in session
-    
-    if photo_path and latest_breedname:
-        Collection.add(photo_path, latest_breedname, session.get('user_id'))
-        photo_path = None
-        latest_breedname = None
-        
+    logged_in = 'username' in session        
     return render_template('take_photo.html', logged_in=logged_in, current_user=session.get('username'), title='Take Photo', breedname = latest_breedname)
 
 
 @app.route('/tasks', methods=['POST', 'GET'])
 def tasks():
+    global photo_path
+    global latest_breedname
+    print(f"photo path 1: {photo_path}")
+    print(f"breedname 1: {latest_breedname}")
     logged_in = 'username' in session
     if request.method == 'POST':
         if request.form.get('click') == 'Capture':
@@ -247,6 +243,12 @@ def tasks():
         elif request.form.get('click') == 'Save':
             global save
             save = 1
+            print(f"photo path: {photo_path}")
+            print(f"breedname: {latest_breedname}")
+            if photo_path and latest_breedname:
+                Collection.add(photo_path, latest_breedname, session.get('user_id'))
+                photo_path = None
+                latest_breedname = None
             return render_template('take_photo.html', logged_in=logged_in,  title='Take Photo', show_modal=False, upload=True, breed=latest_breedname, uploaded_image_url=photo_path)
         elif request.form.get('click') == 'Retake':
             global retake
