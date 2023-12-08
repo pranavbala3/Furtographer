@@ -6,7 +6,11 @@
             closePopup();
         </script>
         <p style="color: rgb(0, 255, 76); text-align: center;">Furto Captured!</p>
+        {% if breed == 'None' %}
+        <p style="color: rgb(0, 0, 0); text-align: center;">Your picture has no dawgs in it!</p>
+        {% else %}
         <p style="color: rgb(0, 0, 0); text-align: center;">It seems like you uploaded a {{breed}}</p>
+        {% endif %}
         <div style="margin: auto; display: inline-block; text-align: left">
             <img src="{{ uploaded_image_url }}" style="max-width: 800px; max-height: 500px;" alt="uploaded image">
         </div>
