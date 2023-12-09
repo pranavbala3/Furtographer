@@ -47,7 +47,7 @@ pip install -r requirements.txt
 #### 3.  Open the Docker Desktop app to start Docker Engine
 
 ### Step 5: Start the DB Container
-1. Change directory to `database` folder.
+1. Change directory to `database` folder (cd database).
 2. Run the following command to start db. It will apply all SQL scripts under `sql` folder using the db migration tool "Flyway"
 If you have make:
 ```
@@ -70,6 +70,7 @@ docker-compose --file docker-compose.yml down
 
 ### Step 6: Launch the app:
 (make sure running from an app that has or can have access to your systems camera), then run the following command.
+(you might need to cd .. to get out of the database folder)
 ```
 python app.py
 ```
