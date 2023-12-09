@@ -1,8 +1,10 @@
-# Furtographer (User Manual/Readme)
+# Furtographer
 Designed and Developed for CSDS 393 @ CWRU
 By: Benjamin Luo, Pranav Balabhadra, Timothy Cronin, Anthony Wang, Mia Yang
 
-Furtographer is a Flask web app that allows users to login/register, take photos of dogs, receive a dog breed prediction, and store their captures in a personalized, interactable collection. It is designed to run on your local machine, and can be set up following the instructions below. Status of known bugs can be found in the issues tab, and omissions will be discussed below (After Setup)
+Furtographer is a Flask web app that allows users to login/register, take photos of dogs, receive a dog breed classification, and store their captures in a personalized, interactable collection. It is designed to run on your local machine, and can be set up following the instructions below.
+
+Status of known bugs can be found in the issues tab, and omissions will be discussed below (After Setup)
 
 You can find the User Manual here:
 ![User Manual](./USER_MANUAL.md)
@@ -89,7 +91,6 @@ In the console a link will appear to run this app that you can paste into your b
    `make predict IMG=*path*`
 
 ## Omissions and discussion of future developments
-
 - Deploy Furtographer as a mobile application (Containerize, incorporate server-side deployment for ML model and database image storage)
 - Add FAQs and help section for user guidance
 - User’s ability to edit their profile information
@@ -102,4 +103,3 @@ In the console a link will appear to run this app that you can paste into your b
 - Track images by location of captured image
 - Different collection views (not just table, but map of images based on captured location)
 - Interacting with other users (social media aspect)
-
