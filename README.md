@@ -1,16 +1,24 @@
-# Furtographer
-CSDS 393: Software Engineering Project
+# Furtographer (User Manual/Readme)
+Designed and Developed for CSDS 393 @ CWRU
+By: Benjamin Luo, Pranav Balabhadra, Timothy Cronin, Anthony Wang, Mia Yang
 
-## Setup Locally
+Furtographer is a Flask web app that allows users to login/register, take photos of dogs, receive a dog breed prediction, and store their captures in a personalized, interactable collection. It is designed to run on your local machine, and can be set up following the instructions below. Status of known bugs can be found in the issues tab, and omissions will be discussed below (After Setup)
 
-Requires Python *3.11* and the docker application.
+You can find the User Manual here:
+![User Manual](./USER_MANUAL.md)
 
-### Clone
+Thank you so much and we hope you enjoy it!
+
+# Setup
+
+To set up the Furtographer app, please make sure you have at least Python *3.11* and the Docker application installed beforehand.
+
+### Step 1: Clone the repository
 ```
 git clone https://github.com/pranavbala3/Furtographer.git
 cd Furtographer
 ```
-### Virtual Environment
+### Step 2: Set up your Virtual Environment
 ```
 python3 -m venv venv
 ```
@@ -22,12 +30,12 @@ In *cmd.exe:* `env\Scripts\activate.bat`
 
 In *powershell:* `env\Scripts\Activate.ps1`
 
-### Install Requirements
+### Step 3: Install Requirements
 ```
 pip install -r requirements.txt
 ```
 
-### Setup Database
+### Step 4: Setup Database
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 2. Install `docker` and `docker-compose`
     ```
@@ -36,7 +44,7 @@ pip install -r requirements.txt
     ```
 3.  Open the Docker Desktop app to start Docker Engine
 
-### Start the DB Container
+### Step 5: Start the DB Container
 1. Change directory to `database` folder.
 2. Run the following command to start db. It will apply all SQL scripts under `sql` folder using the db migration tool "Flyway"
 If you have make:
@@ -48,7 +56,7 @@ otherwise
 docker-compose --file docker-compose.yml up --detach
 ```
 
-### Stop the DB Container
+### Step 5.5: Stop the DataBase Container once done using the app (After step 6)
 If you have make
 ```
 make docker_down
@@ -58,13 +66,14 @@ otherwise
 docker-compose --file docker-compose.yml down
 ```
 
-### To Run
-(make sure running from an app that has or can have access to your systems camera)
+### Step 6: Launch the app:
+(make sure running from an app that has or can have access to your systems camera), then run the following command.
 ```
 python app.py
 ```
+In the console a link will appear to run this app that you can paste into your browser.
 
-## For Training and Predicting
+## If you are interested in viewing the Deep Learning model we used for Training and Predicting…
 
 1. Download datasets:
 
@@ -78,3 +87,19 @@ python app.py
 3. Begin predicting with:
 
    `make predict IMG=*path*`
+
+## Omissions and discussion of future developments
+
+- Deploy Furtographer as a mobile application (Containerize, incorporate server-side deployment for ML model and database image storage)
+- Add FAQs and help section for user guidance
+- User’s ability to edit their profile information
+- Increase criteria/customization to profile information
+- Support functionality to enable Users to reset their password in case forgot password
+- Support functionality to allow users to log in with emails (Gmail login support)
+- Users can delete their account and remove their associated data from the Furtographer database permanently 
+- Privacy may need to be investigated 
+- Images/Furtos can contain additional metadata, including location 
+- Track images by location of captured image
+- Different collection views (not just table, but map of images based on captured location)
+- Interacting with other users (social media aspect)
+
