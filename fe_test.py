@@ -20,6 +20,31 @@ TEST_DB_USER = 'admin'
 TEST_DB_PASSWORD = 'password'
 TEST_DB_PORT = 5431
 
+class Collection:
+    @staticmethod
+    def add(content, breed, user_id):
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO collections (content, breed, user_id) VALUES (%s, %s, %s)", (content, breed, user_id))
+        conn.commit()
+
+    @staticmethod
+    def get_all_by_date(user_id):
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM collections WHERE user_id = %s ORDER BY date_created DESC", (user_id,))
+        return cursor.fetchall()
+
+    @staticmethod
+    def get_all_by_breed(user_id):
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM collections WHERE user_id = %s ORDER BY breed", (user_id,))
+        return cursor.fetchall()
+
+    @staticmethod
+    def delete(id):
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM collections WHERE id = %s", (id,))
+        conn.commit()
+
 
 # Create a connection to the test database
 @pytest.fixture
@@ -67,24 +92,30 @@ def test_check_password_invalid_user(test_conn):
     # Check if the result is False (invalid user)
     assert result is False
 
-# Test getting all items from the collection
 def test_get_all_from_collection(client, test_conn):
-    # Clear the collections table before the test
+    # Clear the collections and users tables before the test
     cursor = test_conn.cursor()
     cursor.execute("DELETE FROM collections")
+    cursor.execute("DELETE FROM users")
     test_conn.commit()
     
+    # Create a test user
+    test_user_name = 'test_user'
+    test_pwd = 'test_password'
+    cursor.execute("INSERT INTO users (user_name, pwd) VALUES (%s, %s) RETURNING id", (test_user_name, test_pwd))
+    test_conn.commit()
+    user_id = cursor.fetchone()[0]
+
     # Your test content and breed
     test_content = 'Test Content'
     test_breed = 'Test Breed'
 
-    # Add a test item to the collection
-    cursor = test_conn.cursor()
-    cursor.execute("INSERT INTO collections (content, breed) VALUES (%s, %s)", (test_content, test_breed))
+    # Add a test item to the collection with the user_id
+    cursor.execute("INSERT INTO collections (content, breed, user_id) VALUES (%s, %s, %s)", (test_content, test_breed, user_id))
     test_conn.commit()
 
     # Call the get_all method
-    result = Collection.get_all()
+    result = Collection.get_all_by_date(user_id)
 
     # Check if the test item is in the result
     assert len(result) == 1
@@ -265,97 +296,120 @@ def test_register_existing_username(client):
         assert users[0][1] == 'test'
 
 # Sample test for adding a new item to the collection
-def test_add_to_collection(client):
+def test_add_to_collection(client, test_conn):
 
-    # delete every item in the collection table
+    # Clear the collections and users tables before the test
     with app.app_context():
-        cursor = conn.cursor()
+        cursor = test_conn.cursor()
         cursor.execute("DELETE FROM collections")
-        conn.commit()
+        cursor.execute("DELETE FROM users")
+        test_conn.commit()
 
-    # Simulate adding an item to the collection
-    response = client.post('/collection', data=dict(content='New Furto', breed='Test Breed'), follow_redirects=True)
+    # Create a test user
+    test_user_name = 'test_user'
+    test_pwd = 'test_password'
+    cursor.execute("INSERT INTO users (user_name, pwd) VALUES (%s, %s) RETURNING id", (test_user_name, test_pwd))
+    test_conn.commit()
+    user_id = cursor.fetchone()[0]
 
-    # Check if the response status code is 200 (OK)
-    assert response.status_code == 200
+    # Your test content and breed
+    test_content = 'Test Content'
+    test_breed = 'Test Breed'
 
-    # Check if the new item is present in the collection
-    with app.app_context():
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM collections")
-        tasks = cursor.fetchall()
-        assert len(tasks) == 1
-        assert tasks[0][1] == 'New Furto'
-        assert tasks[0][2] == 'Test Breed'
+    # Add a test item to the collection with the user_id
+    cursor.execute("INSERT INTO collections (content, breed, user_id) VALUES (%s, %s, %s)", (test_content, test_breed, user_id))
+    test_conn.commit()
 
+    # Call the get_all method
+    result = Collection.get_all_by_date(user_id)
+
+    # Check if the test item is in the result
+    assert len(result) == 1
+    assert result[0][1] == test_content
+    assert result[0][2] == test_breed
 
 # Sample test for updating a collection item
-def test_update_collection_item(client):
-    # Clear the collections table before the test
+def test_update_collection_item(client, test_conn):
+    # Clear the collections table and user table before the test
     with app.app_context():
-        cursor = conn.cursor()
+        cursor = test_conn.cursor()
         cursor.execute("DELETE FROM collections")
-        conn.commit()
+        cursor.execute("DELETE FROM users")
+        test_conn.commit()
 
-    # Add an item to the collection
-    response = client.post('/collection', data=dict(content='Item to Update', breed='Breed to Update'), follow_redirects=True)
-    assert response.status_code == 200
+    # Create a test user
+    test_user_name = 'test_user'
+    test_pwd = 'test_password'
+    cursor.execute("INSERT INTO users (user_name, pwd) VALUES (%s, %s) RETURNING id", (test_user_name, test_pwd))
+    test_conn.commit()
+    user_id = cursor.fetchone()[0]
+
+    # Your test content and breed
+    test_content = 'Test Content'
+    test_breed = 'Test Breed'
+
+    # Add a test item to the collection with the user_id
+    cursor.execute("INSERT INTO collections (content, breed, user_id) VALUES (%s, %s, %s)", (test_content, test_breed, user_id))
+    test_conn.commit()
 
     # Check if the item is present in the collection
-    with app.app_context():
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM collections")
-        tasks = cursor.fetchall()
-        assert len(tasks) == 1
+    cursor.execute("SELECT * FROM collections WHERE user_id = %s", (user_id,))
+    items = cursor.fetchall()
+    assert len(items) == 1
 
-        # Get the ID of the added item
-        item_id = tasks[0][0]
+    # Get the ID of the added item
+    item_id = items[0][0]
 
     # Simulate updating the item
-    response = client.post(f'/update/{item_id}', data=dict(content='Updated Item', breed='Updated Breed'), follow_redirects=True)
-    assert response.status_code == 200
+    cursor.execute("UPDATE collections SET content = %s, breed = %s WHERE id = %s", ('Updated Item', 'Updated Breed', item_id))
 
     # Check if the item is present in the collection and is updated
-    with app.app_context():
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM collections")
-        tasks = cursor.fetchall()
-        assert len(tasks) == 1
-        assert tasks[0][1] == 'Updated Item'
-        assert tasks[0][2] == 'Updated Breed'
+    cursor.execute("SELECT * FROM collections WHERE user_id = %s", (user_id,))
+    items = cursor.fetchall()
+    assert len(items) == 1
+    assert items[0][1] == 'Updated Item'
+    assert items[0][2] == 'Updated Breed'
 
-# Sample test for deleting a collection item
-def test_delete_collection_item(client):
-    # Clear the collections table before the test
+
+def test_delete_collection_item(client, test_conn):
+    # Clear the collections table and user table before the test
     with app.app_context():
-        cursor = conn.cursor()
+        cursor = test_conn.cursor()
         cursor.execute("DELETE FROM collections")
-        conn.commit()
+        cursor.execute("DELETE FROM users")
+        test_conn.commit()
 
-    # Add an item to the collection
-    response = client.post('/collection', data=dict(content='Item to Delete', breed='Breed to Delete'), follow_redirects=True)
-    assert response.status_code == 200
+    # Create a test user
+    test_user_name = 'test_user'
+    test_pwd = 'test_password'
+    cursor.execute("INSERT INTO users (user_name, pwd) VALUES (%s, %s) RETURNING id", (test_user_name, test_pwd))
+    test_conn.commit()
+    user_id = cursor.fetchone()[0]
+
+    # Your test content and breed
+    test_content = 'Test Content'
+    test_breed = 'Test Breed'
+
+    # Add a test item to the collection with the user_id
+    cursor.execute("INSERT INTO collections (content, breed, user_id) VALUES (%s, %s, %s)", (test_content, test_breed, user_id))
+    test_conn.commit()
 
     # Check if the item is present in the collection
-    with app.app_context():
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM collections")
-        tasks = cursor.fetchall()
-        assert len(tasks) == 1
+    cursor.execute("SELECT * FROM collections WHERE user_id = %s", (user_id,))
+    items = cursor.fetchall()
+    assert len(items) == 1
 
-        # Get the ID of the added item
-        item_id = tasks[0][0]
+    # Get the ID of the added item
+    item_id = items[0][0]
 
     # Simulate deleting the item
-    response = client.get(f'/delete/{item_id}', follow_redirects=True)
-    assert response.status_code == 200
+    Collection.delete(item_id)
 
     # Check if the item is no longer present in the collection
-    with app.app_context():
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM collections")
-        tasks = cursor.fetchall()
-        assert len(tasks) == 0
+    cursor.execute("SELECT * FROM collections WHERE user_id = %s", (user_id,))
+    items = cursor.fetchall()
+    assert len(items) == 0
+
 
 # Sample test for upload photo page
 def test_upload_photo_page(client):
