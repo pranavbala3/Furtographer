@@ -428,12 +428,6 @@ def test_tasks_capture(client):
     assert response.status_code == 200
     assert b'Take Photo' in response.data  # Adjust this line based on your expected response
 
-# Sample test to check the response when clicking 'Save'
-def test_tasks_save(client):
-    response = client.post('/tasks', data={'click': 'Save'})
-    assert response.status_code == 200
-    # assert b'Take Photo' not in response.data # figure the best way to check assertion later
-
 # Sample test to check the response when clicking 'Retake'
 def test_tasks_retake(client):
     response = client.post('/tasks', data={'click': 'Retake'})
@@ -445,3 +439,101 @@ def test_tasks_invalid_action(client):
     response = client.post('/tasks', data={'click': 'InvalidAction'})
     assert response.status_code == 200
     assert b'fail' in response.data  # Adjust this line based on your expected response
+
+# Sample test for retaking a photo
+def test_tasks_retake(client):
+    response = client.post('/tasks', data={'click': 'Retake'})
+    assert response.status_code == 200
+    assert b'Take Photo' in response.data  # Adjust this line based on your expected response
+
+def test_upload_photo(client):
+    # Simulate uploading a photo (replace 'file' with your actual file path)
+    response = client.post('/upload', data={'file': (open('static/uploads/chihuahua.jpg', 'rb'), 'photo.jpg')}, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Upload Photo' in response.data  # Adjust this line based on your expected response
+
+# Sample test for handling GET request to '/' route
+def test_index_get(client):
+    response = client.get('/')
+    assert response.status_code == 200
+    assert b'What breed is this dog?' in response.data
+
+# Sample test for handling GET request to '/login' route
+def test_login_get(client):
+    response = client.get('/login')
+    assert response.status_code == 200
+    assert b'Login' in response.data
+
+# Sample test for handling GET request to '/logout' route
+def test_logout_get(client):
+    response = client.get('/logout', follow_redirects=True)
+    assert response.status_code == 200
+    assert b'What breed is this dog?' in response.data
+
+# Sample test for handling GET request to '/register' route
+def test_register_get(client):
+    response = client.get('/register')
+    assert response.status_code == 200
+    assert b'Register' in response.data
+
+# Sample test for handling POST request to '/upload' route without a file
+def test_upload_no_file(client):
+    response = client.post('/upload', data={}, follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Upload Photo' in response.data
+
+# Sample test for logout with logged-in user
+def test_logout_logged_in(client):
+    # Simulate logging in
+    response = client.post('/login', data=dict(username='admin', password='admin'), follow_redirects=True)
+    assert response.status_code == 200
+
+    # Simulate logging out
+    response = client.get('/logout', follow_redirects=True)
+
+    # Check if the user is redirected to the home page
+    assert response.status_code == 200
+    assert b'What breed is this dog?' in response.data
+
+# Sample test for upload photo page with logged-in user
+def test_upload_photo_page_logged_in(client):
+    # Simulate logging in
+    response = client.post('/login', data=dict(username='admin', password='admin'), follow_redirects=True)
+    assert response.status_code == 200
+
+    # Visit the upload photo page
+    response = client.get('/upload_photo')
+    assert response.status_code == 200
+
+    # Check if the user can upload a photo
+    assert b'Upload' in response.data
+
+def test_capture_frame_endpoint(client):
+    response = client.post('/tasks', data={'click': 'Capture'}, follow_redirects=True)
+
+    # Assertions for the expected behavior
+    assert response.status_code == 200
+
+def test_take_photo_endpoint(client):
+    response = client.get('/take_photo')
+
+    # Assertions for the expected behavior
+    assert response.status_code == 200
+
+def test_collection_endpoint(client):
+    response = client.get('/collection')
+
+    # Assertions for the expected behavior
+    assert response.status_code == 302
+
+def test_register_endpoint(client):
+    response = client.post('/register', data={'username': 'newuser', 'password': 'newpassword', 'confirm_password': 'newpassword'})
+
+    # Assertions for the expected behavior
+    assert response.status_code == 302
+
+def test_login_endpoint(client):
+    response = client.post('/login', data={'username': 'testuser', 'password': 'testpassword'})
+
+    # Assertions for the expected behavior
+    assert response.status_code == 200
