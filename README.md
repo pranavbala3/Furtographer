@@ -11,7 +11,7 @@ You can find the User Manual here:
 
 Thank you so much and we hope you enjoy it!
 
-# Setup
+# Setup For Application
 
 To set up the Furtographer app, please make sure you have at least Python *3.11* and the Docker application installed beforehand.
 
@@ -75,18 +75,24 @@ python app.py
 ```
 In the console a link will appear to run this app that you can paste into your browser.
 
-## If you are interested in viewing the Deep Learning model we used for Training and Predicting…
+## Setup For Machine Learning Training
 
-1. Download datasets:
+### Download datasets:
 
 - If You Have ```make```: `make setup_training`
 - Otherwise run
   - ```python -m model.scripts.get_datasets```
   - ```python -m model.scripts.get_bottleneck_features```
 
-2. Look at `train.ipynb` for example training.
+### Start jupyter notebook
+  - Make sure that the jupyter executable you are running is the downloaded by pip install and not be another source, this could require you to stop your current virtual and restart it
+    - **\*NIX:** Check executable location with ```which jupyter```
+    - ***Windows:** Check executable location with ```which jupyter```
+  - ```jupyter notebook```
 
-3. Begin predicting with:
+### Look at `train.ipynb` for example training.
+
+### Begin predicting with:
 
    `make predict IMG=*path*`
 
@@ -97,9 +103,9 @@ In the console a link will appear to run this app that you can paste into your b
 - Increase criteria/customization to profile information
 - Support functionality to enable Users to reset their password in case forgot password
 - Support functionality to allow users to log in with emails (Gmail login support)
-- Users can delete their account and remove their associated data from the Furtographer database permanently 
-- Privacy may need to be investigated 
-- Images/Furtos can contain additional metadata, including location 
+- Users can delete their account and remove their associated data from the Furtographer database permanently
+- Privacy may need to be investigated
+- Images/Furtos can contain additional metadata, including location
 - Track images by location of captured image
 - Different collection views (not just table, but map of images based on captured location)
 - Interacting with other users (social media aspect)
