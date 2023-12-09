@@ -75,6 +75,12 @@ python app.py
 ```
 In the console a link will appear to run this app that you can paste into your browser.
 
+If you get errors relating to `psychodb2` try stop the container and restarting it.
+```
+make docker_down
+make docker_up
+```
+
 ## Setup For Machine Learning Training
 
 ### Download datasets:
