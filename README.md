@@ -39,12 +39,12 @@ pip install -r requirements.txt
 
 ### Step 4: Setup Database
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-1.5 For Mac: Can Install `docker` and `docker-compose` below using Brew
+2. For Mac: Can Install `docker` and `docker-compose` below using Brew
     ```
     $ brew install docker
     $ brew install docker-compose
     ```
-2.  Open the Docker Desktop app to start Docker Engine
+#### 3.  Open the Docker Desktop app to start Docker Engine
 
 ### Step 5: Start the DB Container
 1. Change directory to `database` folder.
