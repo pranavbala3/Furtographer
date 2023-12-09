@@ -38,3 +38,6 @@ Check out your collection by pressing the collection tab
 <p align="center">
   <img src="./readme_img/collection.png" width="400">
 </p>
+
+## Logout
+To logout press the logout button at the top right.
