@@ -28,9 +28,9 @@ python3 -m venv venv
 
 **Windows:**
 
-In *cmd.exe:* `env\Scripts\activate.bat`
+In *cmd.exe:* `venv\Scripts\activate.bat`
 
-In *powershell:* `env\Scripts\Activate.ps1`
+In *powershell:* `venv\Scripts\Activate.ps1`
 
 ### Step 3: Install Requirements
 ```
