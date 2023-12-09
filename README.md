@@ -70,13 +70,14 @@ docker-compose --file docker-compose.yml down
 
 ### Step 6: Launch the app:
 (make sure running from an app that has or can have access to your systems camera), then run the following command.
-(you might need to cd .. to get out of the database folder)
 ```
 python app.py
 ```
 In the console a link will appear to run this app that you can paste into your browser.
 
 If you get errors relating to `psychodb2` try stop the container and restarting it.
+
+(If coming from step 5, you might need to cd .. to get out of the database folder)
 ```
 make docker_down
 make docker_up
