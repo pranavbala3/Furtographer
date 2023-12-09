@@ -125,7 +125,6 @@ def generate_frames():
             current_time = time.time()
             if (current_time - last_prediction_time) >= PREDICT_DELAY:
                 cur_breed = model.predict_frame(frame)
-                print(f"Breed from capture {cur_breed}")
                 last_prediction_time = current_time
         if capture:
             capture = 0
@@ -266,8 +265,6 @@ def take_photo():
 def tasks():
     global photo_path
     global latest_breedname
-    print(f"photo path 1: {photo_path}")
-    print(f"breedname 1: {latest_breedname}")
     logged_in = 'username' in session
     if request.method == 'POST':
         if request.form.get('click') == 'Capture':
@@ -278,8 +275,6 @@ def tasks():
             return render_template('take_photo.html', logged_in=logged_in, title='Take Photo', show_modal=True, upload=False, breed=latest_breedname, uploaded_image_url=photo_path)
         elif request.form.get('click') == 'Save':
             global save
-            print(f"photo path: {photo_path}")
-            print(f"breedname: {latest_breedname}")
             save = 1
             save_image()
             if photo_path:
@@ -344,7 +339,6 @@ def collection():
             try:
                 # Retrieve the sort value from the form
                 sort_value = request.args.get('sort', 'date')
-                print(sort_value)
                 if (sort_value == 'date'):
                     tasks = Collection.get_all_by_date(user_id)
                 elif(sort_value == 'breed'):
@@ -354,7 +348,6 @@ def collection():
 
                 # Add counts of total furtos tracking
                 total_furtos = len(tasks)
-                print(total_furtos)
                 tasks_with_headers = [{'id': row[0], 'content': row[1], 'breed': row[2], 'completed': row[3], 'date_created': row[4]} for row in tasks]
                 return render_template('collection.html', title='View Collection', noff=total_furtos, tasks=tasks_with_headers, logged_in=logged_in, current_user=session.get('username'), sort_value=sort_value)
             except Exception as e:
