@@ -36,10 +36,6 @@ In *powershell:* `venv\Scripts\Activate.ps1`
 ```
 pip install -r requirements.txt
 ```
-If you run into an error with tensorflow, you can simply
-```
-pip install tensorflow
-```
 
 ### Step 4: Setup Database
 1. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
