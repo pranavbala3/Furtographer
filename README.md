@@ -3,7 +3,7 @@ Designed and Developed for CSDS 393 @ CWRU
 By: Benjamin Luo, Pranav Balabhadra, Timothy Cronin, Anthony Wang, Mia Yang
 <img width="1512" alt="Picutre of Website" src="https://github.com/pranavbala3/Furtographer/assets/115095351/637bf8bd-7a10-4c7b-bb36-a637d42ff0e5">
 
-Furtographer is a Flask web app that allows users to login/register, take photos of dogs, receive a dog breed classification, and store their captures in a personalized, interactable collection. It is designed to run on your local machine, and can be set up following the instructions below.
+Furtographer is a Flask web app that allows users to login/register, take/upload photos of dogs, receive a dog breed classification, and store their captures in a personalized, interactable collection. It is designed to run on your local machine, and can be set up following the instructions below.
 
 Status of known bugs can be found in the issues tab, and omissions will be discussed below (After Setup)
 
